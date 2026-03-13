@@ -167,43 +167,50 @@
     let currentUserRole = '';
     let currentDeptName = '';
 
-    // Data Dictionary ตามนิยามเป๊ะๆ
+    // Data Dictionary อัปเดตล่าสุด: Cross-check ตามคู่มือ TPS Score 2569
+    // มีการเติมวงเล็บด้านหลัง เพื่อระบุสิทธิ หมวดหมู่ และเตือนความจำ
     const inputOptions = {
         FINANCE: [
-            { value: 'PLAN_REV', text: 'แผนประมาณการรายรับ (บำรุง)' },
-            { value: 'ACTUAL_REV', text: 'ผลการดำเนินงาน - รายรับ (บำรุง)' },
-            { value: 'PLAN_EXP', text: 'แผนประมาณการรายจ่าย (บำรุง)' },
-            { value: 'ACTUAL_EXP', text: 'ผลการดำเนินงาน - รายจ่าย (บำรุง)' },
-            { value: 'AP_BEGIN', text: 'เจ้าหนี้การค้า ต้นงวด (30 ก.ย.)' },
-            { value: 'AP_END', text: 'เจ้าหนี้การค้า ปลายงวด' },
-            { value: 'SUM_AP', text: 'ผลรวมเจ้าหนี้การค้าระหว่างงวด' },
-            { value: 'EXP_LC', text: 'ค่าแรงบุคลากร (LC)' },
-            { value: 'OPERATING_RESULT', text: 'กำไร/ขาดทุน จากการดำเนินงาน' },
-            { value: 'CURRENT_ASSET', text: 'สินทรัพย์หมุนเวียน (หักเงินบริจาคแล้ว)' },
-            { value: 'CURRENT_LIAB', text: 'หนี้สินหมุนเวียน' },
-            { value: 'CASH_EQ', text: 'เงินสด + เทียบเท่า + ฝากประจำ' }
+            { value: 'PLAN_REV', text: 'แผนประมาณการรายรับ [1.1 วินัยการเงิน - เงินบำรุง]' },
+            { value: 'ACTUAL_REV', text: 'ผลการดำเนินงานรายรับจริง [1.1 วินัยการเงิน - เงินบำรุง]' },
+            { value: 'PLAN_EXP', text: 'แผนประมาณการรายจ่าย [1.1 วินัยการเงิน - เงินบำรุง]' },
+            { value: 'ACTUAL_EXP', text: 'ผลการดำเนินงานรายจ่ายจริง [1.1 วินัยการเงิน - เงินบำรุง]' },
+            { value: 'AP_BEGIN', text: 'เจ้าหนี้การค้า ต้นงวด 30 ก.ย. [1.2 ชำระหนี้]' },
+            { value: 'AP_END', text: 'เจ้าหนี้การค้า ปลายงวด [1.2 ชำระหนี้]' },
+            { value: 'SUM_AP', text: 'ผลรวมเจ้าหนี้การค้าระหว่างงวด [1.2 ชำระหนี้]' },
+            { value: 'EXP_LC', text: 'ค่าแรงบุคลากร LC [2.2 ควบคุมต้นทุน]' },
+            { value: 'EXP_CC', text: 'ค่าเสื่อมราคาและสิ่งก่อสร้าง CC [2.1 ข้อมูลประกอบ Unit Cost]' },
+            { value: 'REV_OPERATING', text: 'รายได้ (ไม่รวมงบลงทุน) [3.1 กำไรจากการดำเนินงาน]' },
+            { value: 'EXP_OPERATING', text: 'ค่าใช้จ่าย (ไม่รวมค่าเสื่อมฯ) [3.1 กำไรจากการดำเนินงาน]' },
+            { value: 'NET_INCOME', text: 'กำไรสุทธิ Net Income [3.1 ข้อมูลคิด ROA]' },
+            { value: 'TOTAL_ASSET', text: 'สินทรัพย์รวมทั้งหมด [3.1 ข้อมูลคิด ROA]' },
+            { value: 'CURRENT_ASSET', text: 'สินทรัพย์หมุนเวียน (หักเงินบริจาค) [3.2 ทุนสำรอง NWC]' },
+            { value: 'CURRENT_LIAB', text: 'หนี้สินหมุนเวียน [3.2 สภาพคล่อง / Cash Ratio]' },
+            { value: 'CASH_EQ', text: 'เงินสด + เทียบเท่า + ฝากประจำ [3.2 Cash Ratio]' }
         ],
         INSURANCE: [
-            { value: 'REV_UC', text: 'รายได้ค่ารักษาพยาบาล (UC)' },
-            { value: 'AR_UC_BEGIN', text: 'ลูกหนี้ค่ารักษา UC ต้นงวด (30 ก.ย.)' },
-            { value: 'AR_UC_END', text: 'ลูกหนี้ค่ารักษา UC ปลายงวด' },
-            { value: 'REV_CGD', text: 'รายได้ค่ารักษาพยาบาล (กรมบัญชีกลาง)' },
-            { value: 'AR_CGD_BEGIN', text: 'ลูกหนี้ค่ารักษา กรมบัญชีกลาง ต้นงวด' },
-            { value: 'AR_CGD_END', text: 'ลูกหนี้ค่ารักษา กรมบัญชีกลาง ปลายงวด' }
+            { value: 'REV_OP', text: 'รายได้ค่ารักษาพยาบาล ผู้ป่วยนอก OP [2.1 ข้อมูลประกอบ Unit Cost]' },
+            { value: 'REV_IP', text: 'รายได้ค่ารักษาพยาบาล ผู้ป่วยใน IP [2.1 ข้อมูลประกอบ Unit Cost]' },
+            { value: 'REV_UC', text: 'รายได้ค่ารักษาพยาบาล [1.3 ลูกหนี้ - สิทธิ UC]' },
+            { value: 'AR_UC_BEGIN', text: 'ลูกหนี้ค่ารักษา ต้นงวด 30 ก.ย. [1.3 ลูกหนี้ - สิทธิ UC]' },
+            { value: 'AR_UC_END', text: 'ลูกหนี้ค่ารักษา ปลายงวด [1.3 ลูกหนี้ - สิทธิ UC]' },
+            { value: 'REV_CGD', text: 'รายได้ค่ารักษาพยาบาล [1.3 ลูกหนี้ - สิทธิกรมบัญชีกลาง]' },
+            { value: 'AR_CGD_BEGIN', text: 'ลูกหนี้ค่ารักษา ต้นงวด 30 ก.ย. [1.3 ลูกหนี้ - สิทธิกรมบัญชีกลาง]' },
+            { value: 'AR_CGD_END', text: 'ลูกหนี้ค่ารักษา ปลายงวด [1.3 ลูกหนี้ - สิทธิกรมบัญชีกลาง]' }
         ],
         PHARMACY: [
-            { value: 'COST_INV', text: 'ต้นทุนยาและเวชภัณฑ์มิใช่ยา' },
-            { value: 'INV_MED_BEGIN', text: 'มูลค่ายาและเวชภัณฑ์มิใช่ยา ต้นงวด' },
-            { value: 'INV_MED_END', text: 'มูลค่ายาและเวชภัณฑ์มิใช่ยา ปลายงวด' },
-            { value: 'EXP_MC_MED', text: 'ค่ายาและวัสดุการแพทย์ (MC)' }
+            { value: 'COST_INV', text: 'ต้นทุนยาและเวชภัณฑ์มิใช่ยา (ราคาซื้อ) [1.4 คลังยา]' },
+            { value: 'INV_MED_BEGIN', text: 'มูลค่ายาและเวชภัณฑ์ฯ คงเหลือ ต้นงวด 30 ก.ย. [1.4 คลังยา]' },
+            { value: 'INV_MED_END', text: 'มูลค่ายาและเวชภัณฑ์ฯ คงเหลือ ปลายงวด [1.4 คลังยา]' },
+            { value: 'EXP_MC_MED', text: 'ค่ายาและวัสดุการแพทย์ MC ยา [2.2 ควบคุมต้นทุน]' }
         ],
         SUPPLY: [
-            { value: 'EXP_MC_OTHER', text: 'ค่าวัสดุอื่นๆ (MC)' }
+            { value: 'EXP_MC_OTHER', text: 'ค่าวัสดุอื่นๆ MC อื่นๆ [2.2 ควบคุมต้นทุน]' }
         ],
         MEDSTAT: [
-            { value: 'OP_VISIT', text: 'จำนวน OP Visit' },
-            { value: 'SUM_ADJRW', text: 'ผลรวม AdjRW (ผู้ป่วยใน)' },
-            { value: 'BED_OCCUPANCY', text: 'อัตราครองเตียง (%)' }
+            { value: 'OP_VISIT', text: 'จำนวน OP Visit [2.1 คิด Unit Cost OPD]' },
+            { value: 'SUM_ADJRW', text: 'ผลรวม Sum AdjRW [2.1 คิด Unit Cost IPD / 2.3 Productivity]' },
+            { value: 'BED_OCCUPANCY', text: 'อัตราครองเตียง Bed Occupancy (%) [2.3 Productivity]' }
         ]
     };
 
