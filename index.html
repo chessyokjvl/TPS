@@ -2,310 +2,286 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TPS Score Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบบริหารจัดการการเงินการคลัง (TPS Score)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
     <style>
-        body { font-family: 'Sarabun', sans-serif; transition: background 0.5s ease; }
-        
-        /* ธีมหน้า Login (Premium Hospital) */
-        body.login-theme { 
-            background: linear-gradient(135deg, #093051 0%, #176B9E 100%); 
-            min-height: 100vh; 
-        }
-        .login-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { border-radius: 20px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; background: #fff; }
-        .hospital-icon { width: 80px; height: 80px; background: #eef7fc; color: #176B9E; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 1.5rem; }
-        .form-floating > label { color: #8fa0b5; font-weight: 400; }
-        .btn-login { background: linear-gradient(to right, #176B9E, #093051); border: none; padding: 12px; font-size: 1.1rem; border-radius: 50px; font-weight: 600; letter-spacing: 0.5px; transition: all 0.3s ease; }
-        .btn-login:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(23, 107, 158, 0.4); }
-        
-        /* ธีมหน้า App หลัก */
-        body.app-theme { background-color: #f4f7fa; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f0f4f8; }
+        .login-bg { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; display: flex; align-items: center; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header { font-weight: 700; border-radius: 12px 12px 0 0 !important; }
         #appContainer { display: none; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
-        .card-header { background-color: #fff; font-weight: 700; border-radius: 12px 12px 0 0 !important; border-bottom: 2px solid #f1f4f8; padding: 1rem 1.25rem; }
-        .nav-tabs .nav-link { color: #5c6b7a; font-weight: 500; padding: 1rem 1.2rem; border: none; border-bottom: 3px solid transparent; }
-        .nav-tabs .nav-link.active { color: #176B9E; border-bottom: 3px solid #176B9E; background-color: transparent; font-weight: 600; }
+        .table-score th { background-color: #2a5298; color: white; text-align: center; }
+        .table-score td { vertical-align: middle; }
     </style>
 </head>
-<body class="login-theme">
+<body class="login-bg" id="bodyTag">
 
-<div id="loginContainer" class="login-wrapper">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-9 col-md-7 col-lg-5">
-                <div class="login-card p-4 p-md-5">
-                    <div class="text-center mb-4">
-                        <div class="hospital-icon">
-                            <i class="fa-solid fa-notes-medical"></i>
-                        </div>
-                        <h3 class="fw-bold text-dark mb-1">TPS Score</h3>
-                        <p class="text-muted small">ระบบติดตามประสิทธิภาพการบริหารการเงินการคลัง</p>
-                    </div>
-                    
-                    <form id="loginForm">
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control bg-light border-0" id="loginUser" placeholder="Username" required autofocus>
-                            <label for="loginUser"><i class="fa-regular fa-user me-2"></i>ชื่อผู้ใช้งาน</label>
-                        </div>
-                        <div class="form-floating mb-4">
-                            <input type="password" class="form-control bg-light border-0" id="loginPass" placeholder="Password" required>
-                            <label for="loginPass"><i class="fa-solid fa-lock me-2"></i>รหัสผ่าน</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 text-white btn-login" id="btnLogin">เข้าสู่ระบบ (Login)</button>
-                    </form>
-                    
-                    <div id="loginAlert" class="alert alert-danger mt-4 small d-none py-2 text-center rounded-3"></div>
+<div class="container" id="loginContainer">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card p-4 shadow-lg">
+                <div class="text-center mb-4">
+                    <img src="https://cdn-icons-png.flaticon.com/512/8004/8004396.png" width="70" class="mb-2">
+                    <h4 class="text-primary fw-bold">TPS Score</h4>
+                    <small class="text-muted">รพ.จิตเวชเลยราชนครินทร์</small>
                 </div>
-                <div class="text-center mt-4 text-white-50 small">
-                    &copy; 2026 Financial Management System
-                </div>
+                <form id="loginForm">
+                    <input type="text" class="form-control mb-3" id="loginUser" placeholder="ชื่อผู้ใช้งาน" required>
+                    <input type="password" class="form-control mb-4" id="loginPass" placeholder="รหัสผ่าน" required>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold" id="btnLogin">เข้าสู่ระบบ</button>
+                </form>
+                <div id="loginAlert" class="alert alert-danger mt-3 d-none text-center small"></div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="container-fluid py-4" id="appContainer">
-    <div class="row align-items-center mb-4 g-3">
-        <div class="col-12 col-md-7 text-center text-md-start">
-            <h3 class="mb-1" style="color: #093051; font-weight: 700;">
-                <i class="fa-solid fa-chart-pie me-2 text-primary"></i>TPS Score Dashboard
-            </h3>
-        </div>
-        <div class="col-12 col-md-5 text-center text-md-end">
-            <span class="badge bg-white text-dark shadow-sm border px-3 py-2 me-2 mb-2 mb-md-0 fs-6 fw-normal">
-                <i class="fa-regular fa-circle-user text-primary me-2"></i><span id="displayDeptName"></span>
-            </span>
-            <button class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm" onclick="location.reload();">
-                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>ออกจากระบบ
-            </button>
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h3 class="text-primary fw-bold mb-2"><i class="fa-solid fa-chart-line me-2"></i>TPS Score Dashboard</h3>
+        <div>
+            <span class="badge bg-white text-primary border p-2 fs-6 me-2"><i class="fa-solid fa-user me-1"></i> <span id="displayDeptName"></span></span>
+            <button class="btn btn-danger btn-sm" onclick="location.reload();">ออกจากระบบ</button>
         </div>
     </div>
 
-    <ul class="nav nav-tabs mb-4 flex-nowrap overflow-auto" id="mainTab" style="white-space: nowrap; border-bottom: 2px solid #dee2e6;">
-        <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#dashboard"><i class="fa-solid fa-desktop me-2"></i>หน้าภาพรวม (Dashboard)</a>
-        </li>
-        <li class="nav-item" id="navInputTab">
-            <a class="nav-link" data-bs-toggle="tab" href="#input"><i class="fa-solid fa-file-pen me-2"></i>บันทึกข้อมูลประจำเดือน</a>
-        </li>
+    <ul class="nav nav-tabs mb-4 bg-white rounded-top pt-2 px-2 shadow-sm">
+        <li class="nav-item"><a class="nav-link active fw-bold" data-bs-toggle="tab" href="#dashboard"><i class="fa-solid fa-chart-bar me-1"></i> Dashboard สรุปผล</a></li>
+        <li class="nav-item" id="navInputTab"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#input"><i class="fa-solid fa-keyboard me-1"></i> บันทึกข้อมูล (รายเดือน)</a></li>
     </ul>
 
     <div class="tab-content">
-        
         <div class="tab-pane fade show active" id="dashboard">
-            <div class="row g-4">
-                <div class="col-12 col-lg-4">
-                    <div class="card h-100" style="border-top: 5px solid #176B9E;">
-                        <div class="card-header text-primary"><i class="fa-solid fa-scale-balanced me-2"></i>1. สภาพคล่อง</div>
+            <div class="alert alert-info border-0 shadow-sm"><i class="fa-solid fa-circle-info me-2"></i> ระบบกำลังประมวลผลข้อมูล Real-time 15 คะแนนเต็ม</div>
+            
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card border-top border-primary border-4 h-100">
+                        <div class="card-header bg-white text-primary">1. การบริหารแผนและสภาพคล่อง (4.5)</div>
                         <div class="card-body">
-                            <div class="text-center p-4 rounded mb-3" style="background: #eef7fc;">
-                                <h6 class="text-secondary mb-2">อัตราส่วนทุนสำรองสุทธิ (NWC)</h6>
-                                <h3 class="text-primary mb-0 fw-bold">รอข้อมูล</h3>
-                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between"><span>วินัยทางการเงิน</span> <strong class="text-primary" id="score_1_1">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>การชำระหนี้ (&le;90 วัน)</span> <strong class="text-success" id="score_1_2">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>เรียกเก็บหนี้ (&le;60 วัน)</span> <strong class="text-success" id="score_1_3">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>คลังยา (&le;60 วัน)</span> <strong class="text-warning" id="score_1_4">รอข้อมูล</strong></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
-                    <div class="card h-100" style="border-top: 5px solid #198754;">
-                        <div class="card-header text-success"><i class="fa-solid fa-gears me-2"></i>2. ต้นทุนและประสิทธิภาพ</div>
-                        <div class="card-body text-center d-flex flex-column justify-content-center">
-                            <p class="text-muted">กำลังพัฒนากราฟข้อมูล...</p>
+                <div class="col-lg-4">
+                    <div class="card border-top border-success border-4 h-100">
+                        <div class="card-header bg-white text-success">2. ต้นทุนและประสิทธิภาพ (5.5)</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between"><span>Unit Cost OPD</span> <strong id="score_2_1_1">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Unit Cost IPD</span> <strong id="score_2_1_2">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>ควบคุมค่าใช้จ่าย</span> <strong id="score_2_2">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Productivity</span> <strong id="score_2_3">รอข้อมูล</strong></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-4">
-                    <div class="card h-100" style="border-top: 5px solid #ffc107;">
-                        <div class="card-header text-warning"><i class="fa-solid fa-arrow-trend-up me-2"></i>3. ความสามารถในการทำกำไร</div>
-                        <div class="card-body text-center d-flex flex-column justify-content-center">
-                            <p class="text-muted">กำลังพัฒนากราฟข้อมูล...</p>
+                <div class="col-lg-4">
+                    <div class="card border-top border-warning border-4 h-100">
+                        <div class="card-header bg-white text-warning">3. ความสามารถในการทำกำไร (5.0)</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between"><span>กำไรจากการดำเนินงาน</span> <strong id="score_3_1_1">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Operating Margin</span> <strong id="score_3_1_2">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>ROA</span> <strong id="score_3_1_3">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>ทุนสำรองสุทธิ (NWC)</span> <strong id="score_3_2_1">รอข้อมูล</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Cash Ratio (&ge;0.8)</span> <strong id="score_3_2_2">รอข้อมูล</strong></li>
+                            </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-white fw-bold"><i class="fa-solid fa-table list-check me-2"></i>สรุปเกณฑ์สำคัญในการติดตามด้านการเงินการคลัง (15 คะแนน)</div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover table-bordered table-score mb-0">
+                        <thead>
+                            <tr>
+                                <th>ตัวชี้วัด (Indicator)</th>
+                                <th>เป้าหมาย (Target)</th>
+                                <th width="15%">คะแนนเต็ม</th>
+                                <th width="15%">ผลประเมิน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>วินัยทางการเงิน</td><td>+/- 5%</td><td class="text-center">2</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>การชำระหนี้</td><td>&le; 90 วัน</td><td class="text-center">1</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>การเรียกเก็บหนี้</td><td>&le; 60 วัน</td><td class="text-center">1</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>การบริหารสินค้าคงคลัง</td><td>&le; 60 วัน</td><td class="text-center">0.5</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>การบริหารต้นทุน</td><td>ไม่เกินค่ากลางกลุ่ม รพ.</td><td class="text-center">2</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>การควบคุมค่าใช้จ่าย*</td><td>ไม่เกินค่ากลางกลุ่ม รพ.</td><td class="text-center">1.5</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>ประสิทธิภาพการใช้ทรัพยากร</td><td>อัตราครองเตียง > 80%, SumAdjRW เพิ่ม</td><td class="text-center">2</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>ความสามารถในการทำกำไร*</td><td>เป็นบวก, มากกว่าค่ากลางกลุ่ม</td><td class="text-center">2</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>ROA (Return of Asset)*</td><td>มากกว่าค่ากลางกลุ่ม รพ.</td><td class="text-center">1</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>ทุนสำรองสุทธิ</td><td>เป็นบวก</td><td class="text-center">1</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                            <tr><td>Cash Ratio</td><td>&ge; 0.8 เท่า</td><td class="text-center">1</td><td class="text-center"><span class="badge bg-secondary">รอดำเนินการ</span></td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <div class="tab-pane fade" id="input">
             <div class="row justify-content-center">
-                <div class="col-12 col-md-10 col-lg-8">
+                <div class="col-md-8">
                     <div class="card shadow-sm">
-                        <div class="card-header bg-white border-bottom pb-3 pt-4 px-4 d-flex align-items-center">
-                            <div style="width: 40px; height: 40px; border-radius: 10px; background: #eef7fc; color: #176B9E;" class="d-flex align-items-center justify-content-center me-3 fs-5">
-                                <i class="fa-solid fa-keyboard"></i>
-                            </div>
-                            <h5 class="mb-0 fw-bold" style="color: #093051;">ฟอร์มบันทึกตัวชี้วัด (รายเดือน)</h5>
-                        </div>
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-4">
                             <form id="dataForm">
-                                <div class="row g-4 mb-4">
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label text-muted fw-semibold">เดือนที่รายงานผล <span class="text-danger">*</span></label>
-                                        <input type="month" class="form-control form-control-lg bg-light" id="report_month" required>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">ประจำเดือนที่รายงาน <span class="text-danger">*</span></label>
+                                        <input type="month" class="form-control" id="report_month" required>
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <label class="form-label text-muted fw-semibold">เลือกตัวชี้วัด <span class="text-danger">*</span></label>
-                                        <select class="form-select form-select-lg bg-light" id="category" required>
-                                            <option value="" selected disabled>-- กรุณาเลือก --</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">ตัวชี้วัด <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="category" required></select>
                                     </div>
                                 </div>
-                                <div class="mb-5">
-                                    <label class="form-label text-muted fw-semibold">ยอดรวม / มูลค่าเงิน (บาท, ครั้ง, วัน) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control form-control-lg text-end fw-bold" style="color: #176B9E; font-size: 1.5rem;" id="amount" step="0.01" placeholder="0.00" required>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">ยอดเงิน / จำนวน (ใส่ตัวเลขเท่านั้น) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control form-control-lg text-primary fw-bold text-end" id="amount" step="0.01" required>
                                 </div>
-                                <button type="submit" class="btn w-100 text-white btn-login fs-5 py-3" id="btnSave">
-                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> บันทึกข้อมูลเข้าฐานระบบ
-                                </button>
+                                <button type="submit" class="btn btn-success w-100 fw-bold fs-5" id="btnSave">บันทึกข้อมูล</button>
                             </form>
-                            <div id="saveAlert" class="alert mt-4 d-none py-3 text-center fw-bold rounded-3 shadow-sm"></div>
+                            <div id="saveAlert" class="alert mt-3 d-none text-center fw-bold"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ========== ใส่ URL ของ Web App ตรงนี้ ==========
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRnPXPAU5o2ZrIDHiGAmiyjqyjXPT8yKmzQGfWR1ktvfsRc1aritegANNYpsbgnId-/exec';
-    
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzySHAjwG6stwZdAN9Z1UlGrY72Zzu1fmvXgqv6GIetv-8K6MRu6ZhVyrm_Z2_96uIV/exec';
     let currentUserRole = '';
     let currentDeptName = '';
 
+    // Data Dictionary ตามนิยามเป๊ะๆ
     const inputOptions = {
         FINANCE: [
-            { value: 'REV_ACTUAL', text: '1. รายได้จริงทั้งหมด (เงินบำรุง+งบประมาณ)' },
-            { value: 'EXP_ACTUAL', text: '2. รายจ่ายจริงทั้งหมด (ตามจ่าย)' },
-            { value: 'AP_TRADE_END', text: '3. เจ้าหนี้การค้าคงเหลือ (สิ้นเดือน)' },
-            { value: 'CASH_END', text: '4. เงินสดและรายการเทียบเท่า (สิ้นเดือน)' },
-            { value: 'EXP_LC', text: '5. ค่าแรงบุคลากร (LC)' }
+            { value: 'PLAN_REV', text: 'แผนประมาณการรายรับ (บำรุง)' },
+            { value: 'ACTUAL_REV', text: 'ผลการดำเนินงาน - รายรับ (บำรุง)' },
+            { value: 'PLAN_EXP', text: 'แผนประมาณการรายจ่าย (บำรุง)' },
+            { value: 'ACTUAL_EXP', text: 'ผลการดำเนินงาน - รายจ่าย (บำรุง)' },
+            { value: 'AP_BEGIN', text: 'เจ้าหนี้การค้า ต้นงวด (30 ก.ย.)' },
+            { value: 'AP_END', text: 'เจ้าหนี้การค้า ปลายงวด' },
+            { value: 'SUM_AP', text: 'ผลรวมเจ้าหนี้การค้าระหว่างงวด' },
+            { value: 'EXP_LC', text: 'ค่าแรงบุคลากร (LC)' },
+            { value: 'OPERATING_RESULT', text: 'กำไร/ขาดทุน จากการดำเนินงาน' },
+            { value: 'CURRENT_ASSET', text: 'สินทรัพย์หมุนเวียน (หักเงินบริจาคแล้ว)' },
+            { value: 'CURRENT_LIAB', text: 'หนี้สินหมุนเวียน' },
+            { value: 'CASH_EQ', text: 'เงินสด + เทียบเท่า + ฝากประจำ' }
         ],
         INSURANCE: [
-            { value: 'AR_UC_END', text: '1. ลูกหนี้สิทธิ UC (สิ้นเดือน)' },
-            { value: 'AR_CGD_END', text: '2. ลูกหนี้เบิกจ่ายตรงกรมบัญชีกลาง (สิ้นเดือน)' }
+            { value: 'REV_UC', text: 'รายได้ค่ารักษาพยาบาล (UC)' },
+            { value: 'AR_UC_BEGIN', text: 'ลูกหนี้ค่ารักษา UC ต้นงวด (30 ก.ย.)' },
+            { value: 'AR_UC_END', text: 'ลูกหนี้ค่ารักษา UC ปลายงวด' },
+            { value: 'REV_CGD', text: 'รายได้ค่ารักษาพยาบาล (กรมบัญชีกลาง)' },
+            { value: 'AR_CGD_BEGIN', text: 'ลูกหนี้ค่ารักษา กรมบัญชีกลาง ต้นงวด' },
+            { value: 'AR_CGD_END', text: 'ลูกหนี้ค่ารักษา กรมบัญชีกลาง ปลายงวด' }
         ],
         PHARMACY: [
-            { value: 'INV_MED_END', text: '1. มูลค่ายาและเวชภัณฑ์คงเหลือ (สิ้นเดือน)' },
-            { value: 'EXP_MC_MED', text: '2. ต้นทุนยาและเวชภัณฑ์ (ที่ใช้ไป)' }
+            { value: 'COST_INV', text: 'ต้นทุนยาและเวชภัณฑ์มิใช่ยา' },
+            { value: 'INV_MED_BEGIN', text: 'มูลค่ายาและเวชภัณฑ์มิใช่ยา ต้นงวด' },
+            { value: 'INV_MED_END', text: 'มูลค่ายาและเวชภัณฑ์มิใช่ยา ปลายงวด' },
+            { value: 'EXP_MC_MED', text: 'ค่ายาและวัสดุการแพทย์ (MC)' }
         ],
         SUPPLY: [
-            { value: 'EXP_MC_MAT', text: '1. ต้นทุนวัสดุการแพทย์/ทันตกรรม/เอกซเรย์' }
+            { value: 'EXP_MC_OTHER', text: 'ค่าวัสดุอื่นๆ (MC)' }
+        ],
+        MEDSTAT: [
+            { value: 'OP_VISIT', text: 'จำนวน OP Visit' },
+            { value: 'SUM_ADJRW', text: 'ผลรวม AdjRW (ผู้ป่วยใน)' },
+            { value: 'BED_OCCUPANCY', text: 'อัตราครองเตียง (%)' }
         ]
     };
 
-    // 1. ระบบ Login
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btnLogin');
         const alertBox = document.getElementById('loginAlert');
-        btn.disabled = true; 
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังตรวจสอบ...';
+        btn.disabled = true; btn.innerText = 'ตรวจสอบ...';
         
-        const payload = {
-            action: 'login',
-            username: document.getElementById('loginUser').value,
-            password: document.getElementById('loginPass').value
-        };
-
         try {
-            const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', username: loginUser.value, password: loginPass.value })
+            });
             const data = await res.json();
-            
             if (data.status === 'success') {
                 currentUserRole = data.role;
                 currentDeptName = data.dept_name;
-                setupUI();
+                document.getElementById('bodyTag').classList.remove('login-bg');
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                document.getElementById('displayDeptName').innerText = currentDeptName;
+                setupInputOptions();
+                fetchDashboard(); // ดึงข้อมูลทันทีหลังเข้าสู่ระบบ
             } else {
-                alertBox.innerHTML = '<i class="fa-solid fa-circle-exclamation me-2"></i>' + data.message; 
-                alertBox.classList.remove('d-none');
+                alertBox.innerText = data.message; alertBox.classList.remove('d-none');
             }
-        } catch (err) {
-            alertBox.innerHTML = '<i class="fa-solid fa-link-slash me-2"></i>เซิร์ฟเวอร์ไม่ตอบสนอง'; 
-            alertBox.classList.remove('d-none');
+        } catch(err) {
+            alertBox.innerText = 'เชื่อมต่อล้มเหลว'; alertBox.classList.remove('d-none');
         }
-        btn.disabled = false; 
-        btn.innerText = 'เข้าสู่ระบบ (Login)';
+        btn.disabled = false; btn.innerText = 'เข้าสู่ระบบ';
     });
 
-    // 2. ตั้งค่า UI หลัง Login
-    function setupUI() {
-        document.body.classList.remove('login-theme');
-        document.body.classList.add('app-theme');
-        document.getElementById('loginContainer').style.display = 'none';
-        
-        // ใช้ Fade In effect เบาๆ
-        const appContainer = document.getElementById('appContainer');
-        appContainer.style.display = 'block';
-        appContainer.style.opacity = 0;
-        setTimeout(() => appContainer.style.opacity = 1, 50);
-
-        document.getElementById('displayDeptName').innerText = currentDeptName;
-
-        const navInput = document.getElementById('navInputTab');
-        const categorySelect = document.getElementById('category');
-        categorySelect.innerHTML = '<option value="" selected disabled>-- กรุณาเลือกตัวชี้วัด --</option>';
-
+    function setupInputOptions() {
+        const select = document.getElementById('category');
+        select.innerHTML = '<option value="" disabled selected>-- เลือกตัวชี้วัด --</option>';
         if (currentUserRole === 'GUEST') {
-            navInput.style.display = 'none';
-        } else {
-            navInput.style.display = 'block';
-            let optionsToRender = currentUserRole === 'ADMIN' ? 
-                [...inputOptions.FINANCE, ...inputOptions.INSURANCE, ...inputOptions.PHARMACY, ...inputOptions.SUPPLY] : 
-                inputOptions[currentUserRole] || [];
-
-            optionsToRender.forEach(opt => {
-                let el = document.createElement('option');
-                el.value = opt.value; el.innerText = opt.text;
-                categorySelect.appendChild(el);
-            });
+            document.getElementById('navInputTab').style.display = 'none';
+            return;
         }
+        const opts = currentUserRole === 'ADMIN' ? 
+            [...inputOptions.FINANCE, ...inputOptions.INSURANCE, ...inputOptions.PHARMACY, ...inputOptions.SUPPLY, ...inputOptions.MEDSTAT] : 
+            inputOptions[currentUserRole] || [];
+        opts.forEach(o => select.innerHTML += `<option value="${o.value}">${o.text}</option>`);
     }
 
-    // 3. ระบบส่งข้อมูลเข้า Database
     document.getElementById('dataForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btnSave');
         const alertBox = document.getElementById('saveAlert');
-        btn.disabled = true; 
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>กำลังประมวลผล...';
-
-        const payload = {
-            action: 'save_data',
-            report_month: document.getElementById('report_month').value,
-            category: document.getElementById('category').value,
-            amount: document.getElementById('amount').value,
-            dept_name: currentDeptName
-        };
+        btn.disabled = true; btn.innerText = 'กำลังบันทึก...';
 
         try {
-            const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const res = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'save_data', report_month: report_month.value,
+                    category: category.value, amount: amount.value, dept_name: currentDeptName
+                })
+            });
             const data = await res.json();
-            
-            if(data.status === 'success') {
-                alertBox.className = 'alert mt-4 alert-success py-3 text-center fw-bold rounded-3 shadow-sm';
-                alertBox.innerHTML = '<i class="fa-solid fa-check-circle me-2 fs-5"></i> ' + data.message;
-                document.getElementById('amount').value = ''; // เคลียร์เฉพาะยอดเงิน ให้เดือนกับหมวดหมู่คงไว้กรอกต่อได้
-            } else {
-                alertBox.className = 'alert mt-4 alert-danger py-3 text-center fw-bold rounded-3 shadow-sm';
-                alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2 fs-5"></i> ' + data.message;
-            }
-            alertBox.classList.remove('d-none');
-        } catch (err) {
-            alertBox.className = 'alert mt-4 alert-danger py-3 text-center fw-bold rounded-3 shadow-sm';
-            alertBox.innerHTML = '<i class="fa-solid fa-link-slash me-2 fs-5"></i> ขัดข้อง ไม่สามารถบันทึกได้';
-            alertBox.classList.remove('d-none');
+            alertBox.className = `alert mt-3 alert-${data.status === 'success' ? 'success' : 'danger'}`;
+            alertBox.innerText = data.message;
+            if(data.status === 'success') { amount.value = ''; fetchDashboard(); }
+        } catch(err) {
+            alertBox.className = 'alert mt-3 alert-danger'; alertBox.innerText = 'เกิดข้อผิดพลาด';
         }
-        btn.disabled = false; 
-        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i> บันทึกข้อมูลเข้าฐานระบบ';
-        setTimeout(() => alertBox.classList.add('d-none'), 4000); // Alert จะหายไปเองใน 4 วินาที
+        alertBox.classList.remove('d-none');
+        btn.disabled = false; btn.innerText = 'บันทึกข้อมูล';
+        setTimeout(() => alertBox.classList.add('d-none'), 3000);
     });
+
+    // ดึงข้อมูลมาแสดง Dashboard (Mock function สำหรับวาง Logic คำนวณในอนาคต)
+    async function fetchDashboard() {
+        // ในระบบจริง จะยิง GET ไปที่ APPS_SCRIPT_URL แล้วนำ data และ config มาเข้าสูตรคณิตศาสตร์
+        // เช่น (data.ACTUAL_REV - data.PLAN_REV) / data.PLAN_REV * 100
+        console.log("Fetching real-time calculation...");
+    }
 </script>
 </body>
 </html>
