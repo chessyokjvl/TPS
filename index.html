@@ -232,7 +232,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ========================================================
-    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่ ⚠️
+    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่
     // ========================================================
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY4RBJNIqC_OVTUPcoRFJrsVR8FonItmWwLQzRq6KE54NTmlgMwKPyYX0AaC1VbDgs/exec';
     
@@ -240,7 +240,6 @@
     let dbData = {}; let globalConfig = {}; 
     let chartInstances = {};
 
-    // โครงสร้างตัวแปร (ตัดแผนและวันออก เหลือ 4 กลุ่มงาน)
     const varGroups = [
         { id: 1, title: 'กลุ่มที่ 1: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (2.1.1, 2.1.2)' } ] },
         { id: 2, title: 'กลุ่มที่ 2: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์งวดนี้ (1.2.4)' } ] },
@@ -295,7 +294,7 @@
                 for(let key in globalConfig) { let el = document.getElementById('cf_' + key); if(el) el.value = globalConfig[key]; }
                 loadDataForMonth(); renderCalculationTab(); renderDashboard(); renderDashboardInsights();
             }
-        } catch (e) {}
+        } catch (e) { console.error(e); }
     }
 
     function loadDataForMonth() {
@@ -314,16 +313,14 @@
     });
 
     // ==========================================
-    // CORE ENGINE (ดึงค่า Plan, Bed และ Days อัตโนมัติ)
+    // CORE ENGINE (ใช้ Condition: รับ >= -5%, จ่าย <= +5%)
     // ==========================================
     function evaluateMonth(monthStr) {
         const d = dbData[monthStr] || {}; 
         
-        // 1. คำนวณวันของเดือนนี้อัตโนมัติ
+        // คำนวณวันของเดือน และดึง Config
         const mParts = monthStr.split('-');
         const daysInMonth = new Date(parseInt(mParts[0]), parseInt(mParts[1]), 0).getDate();
-        
-        // 2. ดึงค่าคงที่จาก Config
         const planRevMo = parseFloat(globalConfig.PLAN_REV_YEAR || 0) / 12;
         const planExpMo = parseFloat(globalConfig.PLAN_EXP_YEAR || 0) / 12;
         const bedCount = parseFloat(globalConfig.BED_COUNT || 120);
@@ -337,11 +334,11 @@
             results.push({ id, name, formula: form, value: val, unit, target, isPass, score: s, scoreMax, isMissing });
         };
 
-        // 1.1
-        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(0)})/${planRevMo.toFixed(0)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', '+/- 5%', false, 0, 1, true);
-        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(0)})/${planExpMo.toFixed(0)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', '+/- 5%', false, 0, 1, true);
+        // 1.1 (อัปเดตลอจิกตามที่ตกลงกันล่าสุด)
+        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(0)})/${planRevMo.toFixed(0)})*100`, val, '%', 'ติดลบไม่เกิน 5%', val >= -5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', 'ติดลบไม่เกิน 5%', false, 0, 1, true);
+        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(0)})/${planExpMo.toFixed(0)})*100`, val, '%', 'บวกไม่เกิน 5%', val <= 5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', 'บวกไม่เกิน 5%', false, 0, 1, true);
         
-        // 1.2 (ใช้ daysInMonth อัตโนมัติ)
+        // 1.2
         if (has('AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(daysInMonth*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${daysInMonth}*${avg})/${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, true);
         if (has('AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(daysInMonth*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${daysInMonth}*${avg})/${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
         if (has('AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(daysInMonth*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${daysInMonth}*${avg})/${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
@@ -376,7 +373,7 @@
         evalData.results.forEach(r => {
             let resText = r.isMissing ? '<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> รอข้อมูล</span>' : r.value.toLocaleString(undefined, {maximumFractionDigits:2});
             let badge = r.isMissing ? `<span class="badge bg-secondary fs-6">-</span>` : (r.isPass ? `<span class="badge bg-success fs-6"><i class="fa-solid fa-check"></i> ${r.score}</span>` : `<span class="badge bg-danger fs-6"><i class="fa-solid fa-xmark"></i> 0</span>`);
-            tbody.innerHTML += `<tr><td class="fw-bold px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name}</td><td class="px-2 px-md-3"><div class="formula-box">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
+            tbody.innerHTML += `<tr><td class="fw-bold text-start px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name}</td><td class="px-2 px-md-3"><div class="formula-box">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
         });
     }
 
