@@ -2,400 +2,371 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ระบบประเมินผล TPS Score - รพ.จิตเวชเลยราชนครินทร์</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; transition: background-color 0.5s ease; }
-        
-        /* ================= ธีมหน้า Login หรูหรา ================= */
-        .login-bg { 
-            background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed; 
-            background-size: cover;
-            position: relative;
-            min-height: 100vh; display: flex; align-items: center; 
-        }
-        .login-bg::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(14, 43, 92, 0.95) 0%, rgba(26, 72, 138, 0.85) 100%);
-            z-index: 1;
-        }
-        #loginContainer { z-index: 2; position: relative; }
-        .login-card {
-            border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            background: #ffffff; overflow: hidden;
-        }
-        .login-header {
-            background: #ffffff; padding: 40px 20px 20px; text-align: center;
-            border-bottom: 4px solid #c5a059; /* เส้นคาดสีทอง */
-        }
-        .login-logo { max-width: 110px; margin-bottom: 20px; drop-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .login-title { color: #0e2b5c; font-weight: 700; font-size: 1.4rem; margin-bottom: 5px; }
-        .login-subtitle { color: #6c757d; font-size: 1rem; font-weight: 500; }
-        .login-body { padding: 40px; background-color: #fcfcfc; }
-        
-        .form-floating > .form-control:focus ~ label::after { background-color: transparent !important; }
-        .form-control:focus { border-color: #c5a059; box-shadow: 0 0 0 0.25rem rgba(197, 160, 89, 0.25); }
-        
-        .btn-login {
-            background: linear-gradient(to right, #0e2b5c, #1a488a); border: none;
-            padding: 14px; font-size: 1.1rem; border-radius: 8px; color: white; transition: all 0.3s;
-        }
-        .btn-login:hover {
-            background: linear-gradient(to right, #1a488a, #235fb3);
-            transform: translateY(-2px); box-shadow: 0 8px 20px rgba(14, 43, 92, 0.3); color: white;
-        }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; transition: background-color 0.5s ease; overflow-x: hidden; }
+        .login-bg { background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-bg::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(14, 43, 92, 0.95) 0%, rgba(26, 72, 138, 0.85) 100%); z-index: 1; }
+        #loginContainer { z-index: 2; position: relative; width: 100%; }
+        .login-card { border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); background: #ffffff; overflow: hidden; width: 100%; }
+        .login-header { background: #ffffff; padding: 40px 20px 20px; text-align: center; border-bottom: 4px solid #c5a059; }
+        .login-logo { max-width: 90px; margin-bottom: 15px; }
+        .login-title { color: #0e2b5c; font-weight: 700; font-size: 1.3rem; margin-bottom: 5px; }
+        .login-subtitle { color: #6c757d; font-size: 0.95rem; font-weight: 500; }
+        .login-body { padding: 30px; background-color: #fcfcfc; }
+        .btn-login { background: linear-gradient(to right, #0e2b5c, #1a488a); border: none; padding: 12px; font-size: 1.1rem; border-radius: 8px; color: white; transition: all 0.3s; }
+        .btn-login:hover { background: linear-gradient(to right, #1a488a, #235fb3); transform: translateY(-2px); color: white; }
 
-        /* ================= ธีมหน้า App หลัก ================= */
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .card-header { font-weight: bold; border-radius: 12px 12px 0 0 !important; background-color: #fff; border-bottom: 2px solid #eee; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card-header { font-weight: bold; border-radius: 12px 12px 0 0 !important; background-color: #fff; border-bottom: 2px solid #f0f0f0; }
         #appContainer { display: none; }
+        .nav-tabs { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-bottom: 2px solid #dee2e6; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tabs .nav-link { white-space: nowrap; padding: 12px 15px; border: none; border-bottom: 3px solid transparent; color: #6c757d; transition: all 0.3s; cursor: pointer; }
+        .nav-tabs .nav-link.active { border-bottom: 3px solid #0e2b5c; color: #0e2b5c; background: transparent; font-weight: 700; }
+        
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table th, .table td { vertical-align: middle; }
         .table-calc th { background-color: #0e2b5c; color: white; white-space: nowrap; }
-        .formula-box { background-color: #f8f9fa; border: 1px dashed #ccc; padding: 6px 10px; border-radius: 5px; font-family: monospace; font-size: 0.9rem; color: #d63384; word-break: break-all; }
-        .group-header { background-color: #e9ecef; font-weight: bold; color: #495057; }
-        .var-input { transition: background-color 0.3s ease; }
+        .formula-box { background-color: #f8f9fa; border: 1px dashed #ccc; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; color: #d63384; word-break: break-all; }
+        .group-header { background-color: #e9ecef; font-weight: bold; color: #0e2b5c; font-size: 1rem; }
+        
+        .var-input { transition: background-color 0.3s ease; font-size: 1.1rem; }
         .input-empty { background-color: #fff3cd !important; border-color: #ffecb5 !important; }
         .input-filled { background-color: #e8f5e9 !important; border-color: #c8e6c9 !important; color: #198754 !important; }
+        
+        .insight-item { border-left: 4px solid; padding: 10px 15px; margin-bottom: 10px; background: #fff; border-radius: 0 8px 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center;}
+        .insight-fail { border-left-color: #dc3545; }
+        .insight-miss { border-left-color: #ffc107; }
+        
+        @media (max-width: 768px) { .container-fluid { padding-left: 10px; padding-right: 10px; } .card-body { padding: 15px; } .formula-box { font-size: 0.75rem; } }
     </style>
 </head>
 <body class="login-bg" id="bodyTag">
 
-<div class="container" id="loginContainer">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-7 col-lg-5">
-            <div class="login-card">
-                <div class="login-header">
-                    <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" alt="Hospital Logo" class="login-logo">
-                    <div class="login-title">ระบบบริหารจัดการการเงินการคลัง</div>
-                    <div class="login-subtitle">โรงพยาบาลจิตเวชเลยราชนครินทร์ (TPS Score)</div>
+<div id="loginContainer">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-11 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                <div class="login-card">
+                    <div class="login-header">
+                        <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" alt="Hospital Logo" class="login-logo">
+                        <div class="login-title">ระบบบริหารการเงินการคลัง</div>
+                        <div class="login-subtitle">โรงพยาบาลจิตเวชเลยราชนครินทร์<br>(TPS Score)</div>
+                    </div>
+                    <div class="login-body">
+                        <form id="loginForm">
+                            <div class="form-floating mb-3 shadow-sm"><input type="text" class="form-control" id="loginUser" placeholder="ชื่อผู้ใช้งาน" required autofocus><label><i class="fa-solid fa-user me-2 text-muted"></i>ชื่อผู้ใช้งาน</label></div>
+                            <div class="form-floating mb-4 shadow-sm"><input type="password" class="form-control" id="loginPass" placeholder="รหัสผ่าน" required><label><i class="fa-solid fa-lock me-2 text-muted"></i>รหัสผ่าน</label></div>
+                            <button type="submit" class="btn btn-login w-100 fw-bold" id="btnLogin">เข้าสู่ระบบ <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i></button>
+                        </form>
+                        <div id="loginAlert" class="alert alert-danger mt-4 d-none text-center small rounded-3"></div>
+                    </div>
                 </div>
-                <div class="login-body">
-                    <form id="loginForm">
-                        <div class="form-floating mb-3 shadow-sm">
-                            <input type="text" class="form-control" id="loginUser" placeholder="ชื่อผู้ใช้งาน" required autofocus>
-                            <label for="loginUser"><i class="fa-solid fa-user me-2 text-muted"></i>ชื่อผู้ใช้งาน</label>
-                        </div>
-                        <div class="form-floating mb-4 shadow-sm">
-                            <input type="password" class="form-control" id="loginPass" placeholder="รหัสผ่าน" required>
-                            <label for="loginPass"><i class="fa-solid fa-lock me-2 text-muted"></i>รหัสผ่าน</label>
-                        </div>
-                        <button type="submit" class="btn btn-login w-100 fw-bold" id="btnLogin">เข้าสู่ระบบ <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i></button>
-                    </form>
-                    <div id="loginAlert" class="alert alert-danger mt-4 d-none text-center small rounded-3"></div>
-                </div>
-            </div>
-            <div class="text-center mt-3 text-white-50 small">
-                &copy; 2026 Financial & Fiscal Management System
             </div>
         </div>
     </div>
 </div>
 
-<div class="container-fluid py-4" id="appContainer">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <h3 class="text-primary fw-bold mb-0" style="color: #0e2b5c !important;"><i class="fa-solid fa-calculator me-2"></i>ระบบประมวลผล TPS Score</h3>
-        <div>
-            <span class="badge bg-white text-primary border p-2 fs-6 me-2 shadow-sm" style="color: #0e2b5c !important;"><i class="fa-solid fa-user-circle me-1"></i> <span id="displayDeptName"></span></span>
-            <button class="btn btn-danger btn-sm shadow-sm" onclick="location.reload();"><i class="fa-solid fa-power-off me-1"></i> ออกจากระบบ</button>
+<div class="container-fluid py-3 py-md-4" id="appContainer">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+        <h3 class="text-primary fw-bold mb-0 text-center text-md-start" style="color: #0e2b5c !important;"><i class="fa-solid fa-chart-line me-2"></i>Executive TPS Dashboard</h3>
+        <div class="d-flex align-items-center justify-content-center flex-wrap gap-2">
+            <span class="badge bg-white text-primary border p-2 fs-6 shadow-sm" style="color: #0e2b5c !important;"><i class="fa-solid fa-user-circle me-1"></i> <span id="displayDeptName"></span></span>
+            <button class="btn btn-danger btn-sm shadow-sm px-3 py-2" onclick="location.reload();"><i class="fa-solid fa-power-off me-1"></i> ออก</button>
         </div>
     </div>
 
-    <ul class="nav nav-tabs mb-4 bg-white rounded-top shadow-sm pt-2 px-2 flex-nowrap overflow-auto" style="white-space: nowrap;">
-        <li class="nav-item"><a class="nav-link active fw-bold" data-bs-toggle="tab" href="#input" style="color: #0e2b5c;"><i class="fa-solid fa-keyboard me-1"></i> 1. บันทึกตัวแปร (Raw Variables)</a></li>
-        <li class="nav-item"><a class="nav-link fw-bold text-success" data-bs-toggle="tab" href="#calculation"><i class="fa-solid fa-square-root-variable me-1"></i> 2. ตารางคำนวณและผลประเมิน</a></li>
-        <li class="nav-item" id="navConfigTab" style="display: none;"><a class="nav-link fw-bold text-danger" data-bs-toggle="tab" href="#config"><i class="fa-solid fa-gears me-1"></i> ตั้งค่าค่ากลาง (Config)</a></li>
+    <ul class="nav nav-tabs mb-4 bg-white rounded-top shadow-sm pt-2 px-2" id="mainTabs">
+        <li class="nav-item"><a class="nav-link active fw-bold" data-bs-toggle="tab" href="#dashboard"><i class="fa-solid fa-chart-pie me-1"></i> 1. ภาพรวม (Dashboard)</a></li>
+        <li class="nav-item" id="navInputTab"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#input"><i class="fa-solid fa-keyboard me-1"></i> 2. บันทึกตัวแปรดิบ</a></li>
+        <li class="nav-item"><a class="nav-link fw-bold text-success" data-bs-toggle="tab" href="#calculation"><i class="fa-solid fa-square-root-variable me-1"></i> 3. ตารางประเมิน 18 ข้อ</a></li>
+        <li class="nav-item" id="navConfigTab" style="display: none;"><a class="nav-link fw-bold text-danger" data-bs-toggle="tab" href="#config"><i class="fa-solid fa-gears me-1"></i> 4. ตั้งค่า (Admin)</a></li>
     </ul>
 
     <div class="tab-content">
-        <div class="tab-pane fade show active" id="input">
-            <div class="card shadow-sm" style="border-top: 4px solid #0e2b5c;">
-                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span class="fs-5" style="color: #0e2b5c;"><i class="fa-solid fa-list-ul me-2"></i>ชุดปฏิบัติการบันทึกข้อมูล</span>
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="input-group input-group-sm shadow-sm">
-                            <span class="input-group-text bg-white fw-bold"><i class="fa-solid fa-filter" style="color: #0e2b5c;"></i></span>
-                            <select class="form-select" id="filterStatus" onchange="filterGrid()" style="border-color: #0e2b5c;">
-                                <option value="ALL">แสดงตัวแปรทั้งหมด</option>
-                                <option value="EMPTY">เฉพาะที่ "ยังไม่กรอก" (สีเหลือง)</option>
-                                <option value="FILLED">เฉพาะที่ "กรอกแล้ว" (สีเขียว)</option>
-                            </select>
-                        </div>
-                        <div class="input-group input-group-sm shadow-sm">
-                            <span class="input-group-text bg-white fw-bold" style="color: #0e2b5c;">เดือน:</span>
-                            <input type="month" class="form-control" id="selectMonth" onchange="loadDataForMonth()" style="border-color: #0e2b5c;">
+        <div class="tab-pane fade show active" id="dashboard">
+            <div class="row g-3">
+                <div class="col-12 col-lg-8">
+                    <div class="card shadow-sm h-100" style="border-top: 4px solid #0e2b5c;">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center"><span class="fw-bold" style="color: #0e2b5c;"><i class="fa-solid fa-chart-area me-2"></i>คะแนนรวม 15 คะแนน (Trend)</span><span class="badge bg-primary rounded-pill px-3" id="dashSyncStatus">อัปเดตล่าสุด...</span></div>
+                        <div class="card-body"><div id="totalScoreChart"></div></div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="card shadow-sm h-100" style="border-top: 4px solid #dc3545;">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center"><span class="fw-bold text-danger"><i class="fa-solid fa-lightbulb me-2"></i>Insight รายเดือน</span><input type="month" class="form-control form-control-sm w-auto" id="insightMonth" onchange="renderDashboardInsights()"></div>
+                        <div class="card-body" style="background-color: #f8f9fa;">
+                            <div id="insightSummary" class="text-center mb-3"><h2 class="fw-bold mb-0" id="insightScoreShow">-</h2><small class="text-muted">คะแนนรวมเดือนนี้</small></div>
+                            <h6 class="fw-bold text-muted mb-3 border-bottom pb-2">รายการที่ต้องปรับปรุง / รอข้อมูล:</h6>
+                            <div id="insightList" style="max-height: 250px; overflow-y: auto;"></div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+            </div>
+            
+            <h5 class="fw-bold mt-4 mb-3" style="color: #0e2b5c;"><i class="fa-solid fa-magnifying-glass-chart me-2"></i>เจาะลึกตัวชี้วัดสำคัญ (Control & Run Chart)</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3"><button class="btn btn-outline-primary w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.1.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Unit Cost OPD</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-primary w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.1.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Unit Cost IPD</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-success w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.1.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Operating Margin</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-success w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.1.3')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Return on Asset (ROA)</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-warning text-dark w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('1.2.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>ระยะเวลาชำระหนี้</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-warning text-dark w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('1.2.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>เรียกเก็บหนี้ UC</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-danger w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.3.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>อัตราครองเตียง</button></div>
+                <div class="col-6 col-md-3"><button class="btn btn-outline-danger w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.2.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Cash Ratio</button></div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="input">
+            <div class="card shadow-sm" style="border-top: 4px solid #0e2b5c;">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 py-3">
+                    <span class="fs-5 fw-bold" style="color: #0e2b5c;"><i class="fa-solid fa-list-ul me-2"></i>ชุดปฏิบัติการบันทึกข้อมูล</span>
+                    <div class="d-flex flex-column flex-sm-row align-items-stretch gap-2 w-100 w-md-auto">
+                        <select class="form-select form-select-sm shadow-sm border-primary" id="filterStatus" onchange="filterGrid()"><option value="ALL">แสดงทั้งหมด</option><option value="EMPTY">เฉพาะที่ยังไม่กรอก (เหลือง)</option><option value="FILLED">เฉพาะที่กรอกแล้ว (เขียว)</option></select>
+                        <div class="input-group input-group-sm shadow-sm"><span class="input-group-text bg-white fw-bold" style="color: #0e2b5c;">เดือน:</span><input type="month" class="form-control border-primary" id="selectMonth" onchange="loadDataForMonth()"></div>
+                    </div>
+                </div>
+                <div class="card-body p-2 p-md-4">
                     <form id="batchSaveForm">
-                        <div class="table-responsive">
-                            <table class="table table-bordered align-middle table-sm">
-                                <thead class="text-center text-white" style="background-color: #1a488a;">
-                                    <tr>
-                                        <th width="20%">รหัสตัวแปร</th>
-                                        <th width="50%">คำอธิบาย / นำไปใช้ในตัวชี้วัดข้อใด</th>
-                                        <th width="30%">ค่าที่บันทึก (ตัวเลข)</th>
-                                    </tr>
-                                </thead>
+                        <div class="table-responsive rounded shadow-sm border mb-3">
+                            <table class="table table-bordered align-middle mb-0 bg-white">
+                                <thead class="text-center text-white" style="background-color: #1a488a;"><tr><th class="min-w-code py-2">รหัสตัวแปร</th><th class="min-w-desc py-2">คำอธิบาย</th><th class="min-w-input py-2">ค่าที่บันทึก</th></tr></thead>
                                 <tbody id="variableGrid"></tbody>
                             </table>
                         </div>
-                        <button type="submit" class="btn btn-lg w-100 fw-bold mt-3 shadow-sm text-white" id="btnBatchSave" style="background: linear-gradient(to right, #0e2b5c, #1a488a);"><i class="fa-solid fa-cloud-arrow-up me-2"></i>บันทึกข้อมูลเข้าสู่ระบบส่วนกลาง</button>
+                        <button type="submit" class="btn btn-lg w-100 fw-bold shadow-sm text-white" id="btnBatchSave" style="background: linear-gradient(to right, #0e2b5c, #1a488a); padding: 15px;"><i class="fa-solid fa-cloud-arrow-up me-2"></i>บันทึกข้อมูลเข้าสู่ระบบส่วนกลาง</button>
                     </form>
-                    <div id="saveAlert" class="alert mt-3 d-none text-center fw-bold"></div>
+                    <div id="saveAlert" class="alert mt-3 d-none text-center fw-bold rounded-3"></div>
                 </div>
             </div>
         </div>
 
         <div class="tab-pane fade" id="calculation">
             <div class="card shadow-sm border-top border-success border-4">
-                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <span class="fs-5 text-success"><i class="fa-solid fa-table-list me-2"></i>ผลการประเมิน 3 เสาหลัก (18 ข้อย่อย)</span>
-                    <div class="d-flex align-items-center bg-light p-2 rounded border">
-                        <label class="me-2 mb-0 fw-bold text-success">ดูผลลัพธ์เดือน:</label>
-                        <input type="month" class="form-control form-control-sm border-success" id="calcMonth" onchange="renderCalculation()">
-                    </div>
+                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                    <span class="fs-5 text-success fw-bold"><i class="fa-solid fa-table-list me-2"></i>ผลการประเมิน 18 ข้อย่อย</span>
+                    <input type="month" class="form-control form-control-sm border-success w-auto" id="calcMonth" onchange="renderCalculationTab()">
                 </div>
-                <div class="card-body p-0 table-responsive">
-                    <table class="table table-hover table-bordered mb-0">
-                        <thead class="table-calc text-center align-middle">
-                            <tr>
-                                <th width="25%">ตัวชี้วัด</th>
-                                <th width="40%">วิธีคำนวณ (ตัวเลขจริงจากระบบ)</th>
-                                <th width="15%">ผลลัพธ์</th>
-                                <th width="10%">เป้าหมาย</th>
-                                <th width="10%">คะแนน</th>
-                            </tr>
-                        </thead>
-                        <tbody id="calcGrid" class="align-middle"></tbody>
-                    </table>
+                <div class="card-body p-0">
+                    <div class="table-responsive"><table class="table table-hover table-bordered mb-0 bg-white"><thead class="table-calc text-center align-middle"><tr><th class="min-w-indicator py-3">ตัวชี้วัด</th><th class="min-w-formula py-3">วิธีคำนวณ (จากระบบ)</th><th class="py-3">ผลลัพธ์</th><th class="py-3">เป้าหมาย</th><th class="py-3">คะแนน</th></tr></thead><tbody id="calcGrid" class="align-middle"></tbody></table></div>
                 </div>
             </div>
         </div>
 
         <div class="tab-pane fade" id="config">
-            <div class="row justify-content-center">
-                <div class="col-md-10">
-                    <div class="card shadow-sm border-top border-danger border-4">
-                        <div class="card-header bg-white text-danger fw-bold"><i class="fa-solid fa-sliders me-2"></i> ตั้งค่าตัวแปรค่ากลางของกลุ่มโรงพยาบาล (Group Mean)</div>
-                        <div class="card-body p-4">
-                            <form id="configForm">
-                                <div class="row g-3">
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลาง Unit Cost OPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_OPD" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลาง Unit Cost IPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_IPD" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลางค่าแรง (LC)</label><input type="number" class="form-control border-danger" id="cf_MEAN_LC" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลางค่ายา (MC Med)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_MED" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลางค่าวัสดุอื่นๆ (MC อื่นๆ)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_OTHER" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลาง Sum AdjRW</label><input type="number" class="form-control border-danger" id="cf_MEAN_ADJRW" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลาง Operating Margin (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_OP_MARGIN" required></div>
-                                    <div class="col-md-6"><label class="small text-muted fw-bold">ค่ากลาง ROA (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_ROA" required></div>
-                                </div>
-                                <button type="submit" class="btn btn-danger w-100 mt-4 fw-bold shadow-sm" id="btnSaveConfig"><i class="fa-solid fa-check-double me-2"></i>บันทึกอัปเดตค่ากลาง</button>
-                            </form>
-                            <div id="configAlert" class="alert mt-3 d-none text-center fw-bold"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="row justify-content-center"><div class="col-12 col-lg-10"><div class="card shadow-sm border-top border-danger border-4"><div class="card-header bg-white text-danger fw-bold py-3"><i class="fa-solid fa-sliders me-2"></i> ตั้งค่าค่ากลาง (Group Mean)</div><div class="card-body p-3 p-md-4">
+                <form id="configForm"><div class="row g-3">
+                    <div class="col-12 col-md-6"><label class="small fw-bold">Unit Cost OPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_OPD" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">Unit Cost IPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_IPD" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่าแรง (LC)</label><input type="number" class="form-control border-danger" id="cf_MEAN_LC" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่ายา (MC Med)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_MED" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่าวัสดุอื่นๆ (MC อื่นๆ)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_OTHER" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">Sum AdjRW</label><input type="number" class="form-control border-danger" id="cf_MEAN_ADJRW" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">Operating Margin (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_OP_MARGIN" required></div>
+                    <div class="col-12 col-md-6"><label class="small fw-bold">ROA (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_ROA" required></div>
+                </div><button type="submit" class="btn btn-danger w-100 mt-4 fw-bold shadow-sm py-3" id="btnSaveConfig">บันทึกอัปเดต</button></form>
+            </div></div></div></div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="chartModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" style="color: #0e2b5c;" id="chartModalTitle"><i class="fa-solid fa-chart-line me-2"></i>Run Chart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body"><div id="apexRunChart"></div></div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ========================================================
-    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่ ⚠️
+    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่
     // ========================================================
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxW36GxKR2Ogy-4YoWr39h-tLRQOWnCH_WpVfW_4V_siie7aJJOtpwpnv2_2X-DnY4J/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwpobFeDDuv-xg_Nu6X0vIsVyQXTn_-pBX6D08150ydlKd1LEI_g6j1dvRKfiYZdxS/exec';
     
     let currentUserRole = ''; let currentDeptName = '';
     let dbData = {}; let globalConfig = {}; 
+    let chartInstances = {};
 
     const varGroups = [
-        { id: 1, title: 'กลุ่มที่ 1: แผนประมาณการ (กรอกครั้งเดียวตอนต้นปีงบ/เดือนตุลาคม)', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'PLAN_REV_YEAR', desc: 'แผนประมาณการรายรับ "ทั้งปี" (1.1.1)' }, { code: 'PLAN_EXP_YEAR', desc: 'แผนประมาณการรายจ่าย "ทั้งปี" (1.1.2)' } ] },
-        { id: 2, title: 'กลุ่มที่ 2: ข้อมูลพื้นฐานประจำเดือน', roles: ['ADMIN', 'FINANCE', 'INSURANCE', 'PHARMACY', 'MEDSTAT'], vars: [ { code: 'DAYS_IN_MONTH', desc: 'จำนวนวันของเดือนนี้ (เช่น 30 หรือ 31) (1.2.1-1.2.4, 2.3.1)' } ] },
-        { id: 3, title: 'กลุ่มที่ 3: กลุ่มงานประกันสุขภาพ (สิทธิ UC / กรมบัญชีกลาง / รวมสิทธิ)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (ยกมาจากงวดที่แล้ว) (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษาของงวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับค่ารักษาของงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษาพยาบาล OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษาพยาบาล IPD (2.1.1, 2.1.2)' } ] },
-        { id: 4, title: 'กลุ่มที่ 4: กลุ่มงานเภสัชกรรม (คลังยาและเวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (ยกมาจากงวดที่แล้ว) (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยาและเวชภัณฑ์มิใช่ยาออกจากคลังงวดนี้ (1.2.4)' } ] },
-        { id: 5, title: 'กลุ่มที่ 5: กลุ่มงานการเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (1.1.1, 3.1.3)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (1.1.2, 3.1.3)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (1.2.1)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (1.2.1)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมดของงวดนี้ (1.2.1)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) ทั้งหมด (2.1.1, 2.1.2, 2.2.1)' }, { code: 'EXP_MC_MED', desc: 'ค่ายาและเวชภัณฑ์มิใช่ยา (MC ยา) (2.2.2, 2.1.1, 2.1.2)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (2.2.3, 2.1.1, 2.1.2)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (3.1.1, 3.1.2)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อมและตัดจำหน่ายของพัสดุ (3.1.1, 3.1.2, 2.1.1, 2.1.2)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (3.1.2)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (3.1.2)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (3.1.3, 3.2.1)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (3.1.3)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (3.2.1)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (3.2.1, 3.2.2)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (3.2.1)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (3.2.1)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (3.2.1)' }, { code: 'CASH', desc: 'เงินสด (3.2.2)' }, { code: 'CASH_EQ', desc: 'รายการเทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (3.2.2)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (3.2.2)' } ] },
-        { id: 6, title: 'กลุ่มที่ 6: ข้อมูลจากระบบสารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (2.1.1)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (2.1.2, 2.3.2)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (2.3.1)' }, { code: 'BED_COUNT', desc: 'จำนวนเตียง (ค่า Default คือ 120) (2.3.1)' } ] }
+        { id: 1, title: 'กลุ่มที่ 1: แผนประมาณการ (กรอกเดือนตุลาคม)', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'PLAN_REV_YEAR', desc: 'แผนประมาณการรายรับ "ทั้งปี" (1.1.1)' }, { code: 'PLAN_EXP_YEAR', desc: 'แผนประมาณการรายจ่าย "ทั้งปี" (1.1.2)' } ] },
+        { id: 2, title: 'กลุ่มที่ 2: ข้อมูลพื้นฐานประจำเดือน', roles: ['ADMIN', 'FINANCE', 'INSURANCE', 'PHARMACY', 'MEDSTAT'], vars: [ { code: 'DAYS_IN_MONTH', desc: 'จำนวนวันของเดือนนี้ (เช่น 30 หรือ 31)' } ] },
+        { id: 3, title: 'กลุ่มที่ 3: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (2.1.1, 2.1.2)' } ] },
+        { id: 4, title: 'กลุ่มที่ 4: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์งวดนี้ (1.2.4)' } ] },
+        { id: 5, title: 'กลุ่มที่ 5: การเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (1.1.1, 3.1.3)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (1.1.2, 3.1.3)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (1.2.1)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (1.2.1)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมดงวดนี้ (1.2.1)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) รวม (2.1.1, 2.1.2, 2.2.1)' }, { code: 'EXP_MC_MED', desc: 'ค่ายา/เวชภัณฑ์มิใช่ยา (MC ยา) (2.2.2, 2.1.1, 2.1.2)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (2.2.3, 2.1.1, 2.1.2)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (3.1.1, 3.1.2)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อม/ตัดจำหน่ายของพัสดุ (3.1.1, 3.1.2, 2.1.1, 2.1.2)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (3.1.2)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (3.1.2)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (3.1.3, 3.2.1)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (3.1.3)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (3.2.1)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (3.2.1, 3.2.2)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (3.2.1)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (3.2.1)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (3.2.1)' }, { code: 'CASH', desc: 'เงินสด (3.2.2)' }, { code: 'CASH_EQ', desc: 'เทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (3.2.2)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (3.2.2)' } ] },
+        { id: 6, title: 'กลุ่มที่ 6: สารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (2.1.1)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (2.1.2, 2.3.2)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (2.3.1)' }, { code: 'BED_COUNT', desc: 'จำนวนเตียง (ค่า Default: 120) (2.3.1)' } ] }
     ];
 
-    // Login (รองรับปุ่ม Enter อัตโนมัติจาก Form Submit)
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnLogin'); 
-        btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>กำลังตรวจสอบ...';
+        e.preventDefault(); const btn = document.getElementById('btnLogin'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin me-2"></i>กำลังตรวจสอบ...';
         try {
             const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: loginUser.value, password: loginPass.value }) });
             const data = await res.json();
             if (data.status === 'success') {
                 currentUserRole = data.role; currentDeptName = data.dept_name;
-                document.getElementById('bodyTag').classList.remove('login-bg');
-                document.getElementById('bodyTag').style.backgroundColor = '#f4f7f6';
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
+                document.getElementById('bodyTag').classList.remove('login-bg'); document.getElementById('bodyTag').style.backgroundColor = '#f4f7f6';
+                document.getElementById('loginContainer').style.display = 'none'; document.getElementById('appContainer').style.display = 'block';
                 document.getElementById('displayDeptName').innerText = currentDeptName;
                 
-                const today = new Date();
-                const currMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
-                document.getElementById('selectMonth').value = currMonth;
-                document.getElementById('calcMonth').value = currMonth;
+                const today = new Date(); const currMonth = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+                document.getElementById('selectMonth').value = currMonth; document.getElementById('calcMonth').value = currMonth; document.getElementById('insightMonth').value = currMonth;
                 if (currentUserRole === 'ADMIN') document.getElementById('navConfigTab').style.display = 'block';
                 if (currentUserRole === 'GUEST') document.getElementById('navInputTab').style.display = 'none';
-
-                buildInputGrid();
-                fetchAllData(); 
-            } else {
-                document.getElementById('loginAlert').innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> ' + data.message; 
-                document.getElementById('loginAlert').classList.remove('d-none');
-            }
+                buildInputGrid(); fetchAllData(); 
+            } else { document.getElementById('loginAlert').innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> ' + data.message; document.getElementById('loginAlert').classList.remove('d-none'); }
         } catch(err) {}
         btn.disabled = false; btn.innerHTML = 'เข้าสู่ระบบ <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>';
     });
 
-    // สร้างตารางและตั้งค่าสี
     function buildInputGrid() {
-        const tbody = document.getElementById('variableGrid');
-        tbody.innerHTML = '';
+        const tbody = document.getElementById('variableGrid'); tbody.innerHTML = '';
         varGroups.forEach(group => {
             if (group.roles.includes(currentUserRole) || currentUserRole === 'ADMIN') {
-                tbody.innerHTML += `<tr class="group-header-row" data-group-id="${group.id}"><td colspan="3" class="group-header text-primary"><i class="fa-regular fa-folder-open me-2"></i>${group.title}</td></tr>`;
+                tbody.innerHTML += `<tr class="group-header-row" data-group-id="${group.id}"><td colspan="3" class="group-header py-2 px-3"><i class="fa-regular fa-folder-open me-2"></i>${group.title}</td></tr>`;
                 group.vars.forEach(v => {
                     let ph = v.code === 'BED_COUNT' ? 'placeholder="120"' : '';
-                    tbody.innerHTML += `<tr class="var-row" data-group-id="${group.id}"><td class="fw-bold px-3" style="color: #0e2b5c;">${v.code}</td><td class="text-secondary">${v.desc}</td><td><input type="number" class="form-control form-control-sm var-input fw-bold text-end" id="inp_${v.code}" data-code="${v.code}" step="0.01" ${ph} oninput="updateColor(this)"></td></tr>`;
+                    tbody.innerHTML += `<tr class="var-row" data-group-id="${group.id}"><td class="fw-bold px-2 px-md-3" style="color: #0e2b5c;">${v.code}</td><td class="text-secondary px-2 px-md-3" style="font-size:0.9rem;">${v.desc}</td><td class="px-2 px-md-3"><input type="number" class="form-control var-input fw-bold text-end" id="inp_${v.code}" data-code="${v.code}" step="0.01" ${ph} oninput="updateColor(this)"></td></tr>`;
                 });
             }
         });
     }
-
-    function updateColor(el) {
-        if(el.value !== '') { el.classList.remove('input-empty'); el.classList.add('input-filled'); } 
-        else { el.classList.remove('input-filled'); el.classList.add('input-empty'); }
-    }
-
-    // Filter (คัดกรองสี)
+    function updateColor(el) { if(el.value !== '') { el.classList.remove('input-empty'); el.classList.add('input-filled'); } else { el.classList.remove('input-filled'); el.classList.add('input-empty'); } }
     function filterGrid() {
-        const filter = document.getElementById('filterStatus').value;
-        const rows = document.querySelectorAll('.var-row');
-        rows.forEach(row => {
-            const input = row.querySelector('.var-input');
-            const isFilled = input.value !== '';
-            if (filter === 'ALL') row.style.display = '';
-            else if (filter === 'EMPTY') row.style.display = isFilled ? 'none' : '';
-            else if (filter === 'FILLED') row.style.display = isFilled ? '' : 'none';
-        });
-        document.querySelectorAll('.group-header-row').forEach(header => {
-            const groupId = header.dataset.groupId;
-            const childRows = document.querySelectorAll(`.var-row[data-group-id="${groupId}"]`);
-            let hasVisible = false;
-            childRows.forEach(r => { if(r.style.display !== 'none') hasVisible = true; });
-            header.style.display = hasVisible ? '' : 'none';
-        });
+        const filter = document.getElementById('filterStatus').value; const rows = document.querySelectorAll('.var-row');
+        rows.forEach(row => { const isFilled = row.querySelector('.var-input').value !== ''; if (filter === 'ALL') row.style.display = ''; else if (filter === 'EMPTY') row.style.display = isFilled ? 'none' : ''; else if (filter === 'FILLED') row.style.display = isFilled ? '' : 'none'; });
+        document.querySelectorAll('.group-header-row').forEach(header => { let hasVisible = false; document.querySelectorAll(`.var-row[data-group-id="${header.dataset.groupId}"]`).forEach(r => { if(r.style.display !== 'none') hasVisible = true; }); header.style.display = hasVisible ? '' : 'none'; });
     }
 
-    // ดึงข้อมูล Data/Config
     async function fetchAllData() {
         try {
-            const res = await fetch(APPS_SCRIPT_URL);
-            const result = await res.json();
+            const res = await fetch(APPS_SCRIPT_URL); const result = await res.json();
             if (result.status === 'success') {
-                dbData = result.monthly || {};
-                globalConfig = result.config || {};
+                dbData = result.monthly || {}; globalConfig = result.config || {};
                 for(let key in globalConfig) { let el = document.getElementById('cf_' + key); if(el) el.value = globalConfig[key]; }
-                loadDataForMonth(); 
-                renderCalculation(); 
+                loadDataForMonth(); renderCalculationTab(); renderDashboard(); renderDashboardInsights();
             }
-        } catch (e) {}
+        } catch (e) { console.error(e); }
     }
 
     function loadDataForMonth() {
-        const m = document.getElementById('selectMonth').value;
-        const d = dbData[m] || {};
-        document.querySelectorAll('.var-input').forEach(el => {
-            el.value = d[el.dataset.code] !== undefined ? d[el.dataset.code] : '';
-            updateColor(el);
-        });
-        filterGrid();
+        const m = document.getElementById('selectMonth').value; const d = dbData[m] || {};
+        document.querySelectorAll('.var-input').forEach(el => { el.value = d[el.dataset.code] !== undefined ? d[el.dataset.code] : ''; updateColor(el); }); filterGrid();
     }
 
-    // Save Data
     document.getElementById('batchSaveForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnBatchSave'); const alertBox = document.getElementById('saveAlert');
-        btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังบันทึกข้อมูล...';
-        let payloadVars = {};
-        document.querySelectorAll('.var-input').forEach(el => { if (el.value !== '') payloadVars[el.dataset.code] = el.value; });
+        e.preventDefault(); const btn = document.getElementById('btnBatchSave'); btn.disabled = true;
+        let payloadVars = {}; document.querySelectorAll('.var-input').forEach(el => { if (el.value !== '') payloadVars[el.dataset.code] = el.value; });
         try {
             const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'save_batch', report_month: document.getElementById('selectMonth').value, dept_name: currentDeptName, variables: payloadVars }) });
-            const data = await res.json();
-            alertBox.className = `alert mt-3 alert-${data.status === 'success' ? 'success' : 'danger'}`; alertBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + data.message;
-            if(data.status === 'success') fetchAllData(); 
+            const data = await res.json(); if(data.status === 'success') fetchAllData(); 
         } catch(err) {}
-        alertBox.classList.remove('d-none'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>บันทึกข้อมูลเข้าสู่ระบบส่วนกลาง';
-        setTimeout(() => alertBox.classList.add('d-none'), 3000);
+        btn.disabled = false;
     });
 
-    // --- Calculation Engine ---
-    function getOctoberMonthStr(selectedMonthStr) {
-        if(!selectedMonthStr) return '';
-        let parts = selectedMonthStr.split('-');
-        let octYear = parseInt(parts[1]) >= 10 ? parseInt(parts[0]) : parseInt(parts[0]) - 1;
-        return `${octYear}-10`;
-    }
-
-    function renderCalculation() {
-        const m = document.getElementById('calcMonth').value;
-        const d = dbData[m] || {};
-        const dOct = dbData[getOctoberMonthStr(m)] || {};
-        const planRevMo = parseFloat(d.PLAN_REV_YEAR || dOct.PLAN_REV_YEAR || 0) / 12;
-        const planExpMo = parseFloat(d.PLAN_EXP_YEAR || dOct.PLAN_EXP_YEAR || 0) / 12;
-        const tbody = document.getElementById('calcGrid'); tbody.innerHTML = '';
-
-        function addRow(ind, form, val, unit, target, isPass, scoreEarned) {
-            let resText = isNaN(val) ? '<span class="text-warning"><i class="fa-solid fa-triangle-exclamation"></i> รอข้อมูล</span>' : val.toLocaleString(undefined, {maximumFractionDigits:2});
-            let badge = isPass ? `<span class="badge bg-success"><i class="fa-solid fa-check"></i> ${scoreEarned}</span>` : `<span class="badge bg-danger"><i class="fa-solid fa-xmark"></i> 0</span>`;
-            if (isNaN(val)) badge = `<span class="badge bg-secondary">-</span>`;
-            tbody.innerHTML += `<tr><td class="fw-bold text-start ps-3" style="color: #0e2b5c;">${ind}</td><td><div class="formula-box text-start">${form}</div></td><td class="fw-bold text-primary fs-5">${resText} <span class="fs-6 fw-normal">${unit}</span></td><td class="text-muted small">${target}</td><td class="fs-5">${badge}</td></tr>`;
-        }
-
+    // CORE ENGINE (ใช้ PLAN_REV รายเดือนที่หลังบ้านส่งมาแล้ว)
+    function evaluateMonth(monthStr) {
+        const d = dbData[monthStr] || {}; 
+        const planRevMo = parseFloat(d.PLAN_REV || 0); // Backend หาร 12 มาให้แล้ว
+        const planExpMo = parseFloat(d.PLAN_EXP || 0); // Backend หาร 12 มาให้แล้ว
         const has = (...keys) => keys.every(k => d[k] !== undefined && d[k] !== '');
-        const v = (code) => parseFloat(d[code]);
+        const v = (code) => parseFloat(d[code] || 0);
 
-        // 1
-        tbody.innerHTML += `<tr class="group-header"><td colspan="5" class="text-start ps-2" style="background-color: #e9ecef; border-left: 5px solid #0e2b5c;">1. การบริหารแผนและสภาพคล่อง</td></tr>`;
-        if (has('ACTUAL_REV') && planRevMo > 0) { let val = ((v('ACTUAL_REV') - planRevMo)/planRevMo)*100; addRow('1.1.1 วินัยการเงิน (รายรับ)', `((${v('ACTUAL_REV')} - ${planRevMo.toFixed(2)}) / ${planRevMo.toFixed(2)}) * 100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1); } else addRow('1.1.1 วินัยการเงิน (รายรับ)', 'รอตัวแปร: ACTUAL_REV, แผนรายรับ', NaN, '%', '+/- 5%', false, 0);
-        if (has('ACTUAL_EXP') && planExpMo > 0) { let val = ((v('ACTUAL_EXP') - planExpMo)/planExpMo)*100; addRow('1.1.2 วินัยการเงิน (รายจ่าย)', `((${v('ACTUAL_EXP')} - ${planExpMo.toFixed(2)}) / ${planExpMo.toFixed(2)}) * 100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1); } else addRow('1.1.2 วินัยการเงิน (รายจ่าย)', 'รอตัวแปร: ACTUAL_EXP, แผนรายจ่าย', NaN, '%', '+/- 5%', false, 0);
-        if (has('DAYS_IN_MONTH', 'AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE') !== 0) { let avg = (v('AP_BEGIN')+v('AP_END'))/2; let val = (v('DAYS_IN_MONTH')*avg)/v('AP_PURCHASE'); addRow('1.2.1 ชำระหนี้', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('AP_PURCHASE')}`, val, 'วัน', '&le; 90', val<=90, 1); } else addRow('1.2.1 ชำระหนี้', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'วัน', '&le; 90', false, 0);
-        if (has('DAYS_IN_MONTH', 'AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC') !== 0) { let avg = (v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val = (v('DAYS_IN_MONTH')*avg)/v('REV_UC'); addRow('1.2.2 เรียกเก็บหนี้ UC', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('REV_UC')}`, val, 'วัน', '&le; 60', val<=60, 0.5); } else addRow('1.2.2 เรียกเก็บหนี้ UC', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'วัน', '&le; 60', false, 0);
-        if (has('DAYS_IN_MONTH', 'AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD') !== 0) { let avg = (v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val = (v('DAYS_IN_MONTH')*avg)/v('REV_CGD'); addRow('1.2.3 เรียกเก็บ กรมบัญชีกลาง', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('REV_CGD')}`, val, 'วัน', '&le; 60', val<=60, 0.5); } else addRow('1.2.3 เรียกเก็บ กรมบัญชีกลาง', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'วัน', '&le; 60', false, 0);
-        if (has('DAYS_IN_MONTH', 'INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE') !== 0) { let avg = (v('INV_BEGIN')+v('INV_END'))/2; let val = (v('DAYS_IN_MONTH')*avg)/v('INV_DISPENSE'); addRow('1.2.4 สินค้าคงคลัง', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('INV_DISPENSE')}`, val, 'วัน', '&le; 60', val<=60, 0.5); } else addRow('1.2.4 สินค้าคงคลัง', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'วัน', '&le; 60', false, 0);
+        let results = []; let totalScore = 0;
+        const pushResult = (id, name, form, val, unit, target, isPass, scoreEarn, scoreMax, isMissing=false) => {
+            let s = isMissing ? 0 : (isPass ? scoreEarn : 0); totalScore += s;
+            results.push({ id, name, formula: form, value: val, unit, target, isPass, score: s, scoreMax, isMissing });
+        };
 
-        // 2
-        tbody.innerHTML += `<tr class="group-header"><td colspan="5" class="text-start ps-2" style="background-color: #e9ecef; border-left: 5px solid #198754;">2. ต้นทุนและประสิทธิภาพ</td></tr>`;
-        let tc = (parseFloat(d.EXP_LC)||0) + (parseFloat(d.EXP_MC_MED)||0) + (parseFloat(d.EXP_MC_OTHER)||0) + (parseFloat(d.EXP_DEP_AMORT)||0);
-        let totalRevOPIP = (parseFloat(d.REV_OP)||0) + (parseFloat(d.REV_IP)||0) || 1;
+        // 1.1 วินัยทางการเงิน
+        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รายรับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(2)})/${planRevMo.toFixed(2)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รายรับ)', 'รอตัวแปร: ACTUAL_REV, แผน', NaN, '%', '+/- 5%', false, 0, 1, true);
+        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (รายจ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(2)})/${planExpMo.toFixed(2)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (รายจ่าย)', 'รอตัวแปร: ACTUAL_EXP, แผน', NaN, '%', '+/- 5%', false, 0, 1, true);
+        
+        // 1.2 ชำระหนี้
+        if (has('DAYS_IN_MONTH', 'AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${v('DAYS_IN_MONTH')}*${avg})/${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 90', false, 0, 1, true);
+        if (has('DAYS_IN_MONTH', 'AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${v('DAYS_IN_MONTH')}*${avg})/${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('DAYS_IN_MONTH', 'AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${v('DAYS_IN_MONTH')}*${avg})/${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('DAYS_IN_MONTH', 'INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${v('DAYS_IN_MONTH')}*${avg})/${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.4', 'สินค้าคงคลัง', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
 
-        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT') !== 0) { let val = ((v('REV_OP')/totalRevOPIP)*tc)/v('OP_VISIT'); addRow('2.1.1 Unit Cost OPD', `((${v('REV_OP')} / ${totalRevOPIP}) * ${tc}) / ${v('OP_VISIT')}`, val, 'บาท', '&le; Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1); } else addRow('2.1.1 Unit Cost OPD', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'บาท', '&le; Mean', false, 0);
-        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW') !== 0) { let val = ((v('REV_IP')/totalRevOPIP)*tc)/v('SUM_ADJRW'); addRow('2.1.2 Unit Cost IPD', `((${v('REV_IP')} / ${totalRevOPIP}) * ${tc}) / ${v('SUM_ADJRW')}`, val, 'บาท', '&le; Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1); } else addRow('2.1.2 Unit Cost IPD', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'บาท', '&le; Mean', false, 0);
-        if (has('EXP_LC')) addRow('2.2.1 ค่าแรง (LC)', 'ดึงค่าจากตัวแปร', v('EXP_LC'), 'บาท', '&le; Mean', v('EXP_LC')<=(globalConfig.MEAN_LC||0), 0.5); else addRow('2.2.1 ค่าแรง (LC)', 'รอข้อมูล', NaN, 'บาท', '&le; Mean', false, 0);
-        if (has('EXP_MC_MED')) addRow('2.2.2 ค่ายาและเวชภัณฑ์ (MC)', 'ดึงค่าจากตัวแปร', v('EXP_MC_MED'), 'บาท', '&le; Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5); else addRow('2.2.2 ค่ายาและเวชภัณฑ์ (MC)', 'รอข้อมูล', NaN, 'บาท', '&le; Mean', false, 0);
-        if (has('EXP_MC_OTHER')) addRow('2.2.3 ค่าวัสดุอื่นๆ (MC)', 'ดึงค่าจากตัวแปร', v('EXP_MC_OTHER'), 'บาท', '&le; Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5); else addRow('2.2.3 ค่าวัสดุอื่นๆ (MC)', 'รอข้อมูล', NaN, 'บาท', '&le; Mean', false, 0);
-        if (has('BED_DAYS', 'DAYS_IN_MONTH')) { let bedCount = parseFloat(d.BED_COUNT)||120; let val = (v('BED_DAYS')*100)/(bedCount*v('DAYS_IN_MONTH')); addRow('2.3.1 อัตราครองเตียง', `(${v('BED_DAYS')} * 100) / (${bedCount} * ${v('DAYS_IN_MONTH')})`, val, '%', '> 80%', val>80, 1); } else addRow('2.3.1 อัตราครองเตียง', 'รอข้อมูลตัวแปรให้ครบ', NaN, '%', '> 80%', false, 0);
-        if (has('SUM_ADJRW')) addRow('2.3.2 ผลงานบริการ (Sum AdjRW)', 'ดึงค่าจากตัวแปร', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1); else addRow('2.3.2 ผลงานบริการ (Sum AdjRW)', 'รอข้อมูล', NaN, 'หน่วย', '> Mean', false, 0);
+        // 2. ต้นทุน
+        let tc = v('EXP_LC')+v('EXP_MC_MED')+v('EXP_MC_OTHER')+v('EXP_DEP_AMORT'); let tr = v('REV_OP')+v('REV_IP') || 1;
+        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')}/${tr})*${tc})/${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1); } else pushResult('2.1.1', 'Unit Cost OPD', 'รอข้อมูลตัวแปร', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')}/${tr})*${tc})/${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1); } else pushResult('2.1.2', 'Unit Cost IPD', 'รอข้อมูลตัวแปร', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        
+        if (has('EXP_LC')) pushResult('2.2.1', 'ค่าแรง (LC)', '-', v('EXP_LC'), 'บาท', '<= Mean', v('EXP_LC')<=(globalConfig.MEAN_LC||0), 0.5, 0.5); else pushResult('2.2.1', 'ค่าแรง (LC)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
+        if (has('EXP_MC_MED')) pushResult('2.2.2', 'ค่ายา (MC Med)', '-', v('EXP_MC_MED'), 'บาท', '<= Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5, 0.5); else pushResult('2.2.2', 'ค่ายา (MC Med)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
+        if (has('EXP_MC_OTHER')) pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', v('EXP_MC_OTHER'), 'บาท', '<= Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5, 0.5); else pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
 
-        // 3
-        tbody.innerHTML += `<tr class="group-header"><td colspan="5" class="text-start ps-2" style="background-color: #e9ecef; border-left: 5px solid #ffc107;">3. ความสามารถในการทำกำไร</td></tr>`;
-        let opRev = (parseFloat(d.ACTUAL_REV)||0) - (parseFloat(d.REV_DEP_NHSO)||0);
-        let opExp = (parseFloat(d.ACTUAL_EXP)||0) - (parseFloat(d.EXP_DEP_AMORT)||0);
+        if (has('BED_DAYS', 'DAYS_IN_MONTH')) { let bed = v('BED_COUNT')||120; let val=(v('BED_DAYS')*100)/(bed*v('DAYS_IN_MONTH')); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')}*100)/(${bed}*${v('DAYS_IN_MONTH')})`, val, '%', '> 80%', val>80, 1, 1); } else pushResult('2.3.1', 'อัตราครองเตียง', 'รอข้อมูลตัวแปร', NaN, '%', '> 80%', false, 0, 1, true);
+        if (has('SUM_ADJRW')) pushResult('2.3.2', 'Sum AdjRW', '-', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1, 1); else pushResult('2.3.2', 'Sum AdjRW', 'รอข้อมูล', NaN, 'หน่วย', '> Mean', false, 0, 1, true);
 
-        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev - opExp; addRow('3.1.1 กำไรจากการดำเนินงาน', `(${v('ACTUAL_REV')} - ${(parseFloat(d.REV_DEP_NHSO)||0)}) - (${v('ACTUAL_EXP')} - ${(parseFloat(d.EXP_DEP_AMORT)||0)})`, val, 'บาท', 'เป็นบวก', val>0, 1); } else addRow('3.1.1 กำไรจากการดำเนินงาน', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'บาท', 'เป็นบวก', false, 0);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let v311 = opRev-opExp; let div = v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val = (v311/div)*100; addRow('3.1.2 Operating Margin', `(${v311} / (${v('REV_BUMRUNG')} + ${v('REV_GOV_BUDGET_HR')})) * 100`, val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1); } else addRow('3.1.2 Operating Margin', 'รอข้อมูลตัวแปรให้ครบ', NaN, '%', '> Mean', false, 0);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let netInc = v('ACTUAL_REV')-v('ACTUAL_EXP'); let assets = v('ASSET_CUR')+v('ASSET_NON_CUR'); let val = (netInc/assets)*100; addRow('3.1.3 ROA', `(${netInc} / ${assets}) * 100`, val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1); } else addRow('3.1.3 ROA', 'รอข้อมูลตัวแปรให้ครบ', NaN, '%', '> Mean', false, 0);
-        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let curAst = v('ASSET_CUR')-v('DONATION_FUND'); let curLiab = v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC')); let val = curAst-curLiab; addRow('3.2.1 ทุนสำรองสุทธิ (NWC)', `(${v('ASSET_CUR')} - ${v('DONATION_FUND')}) - (${v('LIAB_CUR')} - (${v('AP_INVEST')}+${v('AP_DONATION')}+${v('DEPOSIT_UC')}))`, val, 'บาท', 'เป็นบวก', val>0, 1); } else addRow('3.2.1 ทุนสำรองสุทธิ (NWC)', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'บาท', 'เป็นบวก', false, 0);
-        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let cash = v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'); let val = cash/v('LIAB_CUR'); addRow('3.2.2 Cash Ratio', `(${v('CASH')} + ${v('CASH_EQ')} + ${v('FIXED_DEPOSIT')}) / ${v('LIAB_CUR')}`, val, 'เท่า', '&ge; 0.8', val>=0.8, 1); } else addRow('3.2.2 Cash Ratio', 'รอข้อมูลตัวแปรให้ครบ', NaN, 'เท่า', '&ge; 0.8', false, 0);
+        // 3. กำไร
+        let opRev = v('ACTUAL_REV')-v('REV_DEP_NHSO'); let opExp = v('ACTUAL_EXP')-v('EXP_DEP_AMORT');
+        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev-opExp; pushResult('3.1.1', 'กำไรดำเนินงาน', `(${v('ACTUAL_REV')}-${v('REV_DEP_NHSO')}) - (${v('ACTUAL_EXP')}-${v('EXP_DEP_AMORT')})`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.1.1', 'กำไรดำเนินงาน', 'รอข้อมูลตัวแปร', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let div=v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val=((opRev-opExp)/div)*100; pushResult('3.1.2', 'Operating Margin', `(${(opRev-opExp)}/${div})*100`, val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1, 1); } else pushResult('3.1.2', 'Operating Margin', 'รอข้อมูลตัวแปร', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let val=((v('ACTUAL_REV')-v('ACTUAL_EXP'))/(v('ASSET_CUR')+v('ASSET_NON_CUR')))*100; pushResult('3.1.3', 'ROA', `(${v('ACTUAL_REV')-v('ACTUAL_EXP')}/${v('ASSET_CUR')+v('ASSET_NON_CUR')})*100`, val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1, 1); } else pushResult('3.1.3', 'ROA', 'รอข้อมูลตัวแปร', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let val=(v('ASSET_CUR')-v('DONATION_FUND'))-(v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC'))); pushResult('3.2.1', 'ทุนสำรองสุทธิ', `(${v('ASSET_CUR')}-${v('DONATION_FUND')}) - (${v('LIAB_CUR')}-...)`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.2.1', 'ทุนสำรองสุทธิ', 'รอข้อมูลตัวแปร', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let val=(v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'))/v('LIAB_CUR'); pushResult('3.2.2', 'Cash Ratio', `(${v('CASH')}+${v('CASH_EQ')}+${v('FIXED_DEPOSIT')}) / ${v('LIAB_CUR')}`, val, 'เท่า', '>= 0.8', val>=0.8, 1, 1); } else pushResult('3.2.2', 'Cash Ratio', 'รอข้อมูลตัวแปร', NaN, 'เท่า', '>= 0.8', false, 0, 1, true);
+
+        return { totalScore, results };
     }
+
+    function renderCalculationTab() {
+        const m = document.getElementById('calcMonth').value; const evalData = evaluateMonth(m);
+        const tbody = document.getElementById('calcGrid'); tbody.innerHTML = '';
+        evalData.results.forEach(r => {
+            let resText = r.isMissing ? '<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> รอข้อมูล</span>' : r.value.toLocaleString(undefined, {maximumFractionDigits:2});
+            let badge = r.isMissing ? `<span class="badge bg-secondary fs-6">-</span>` : (r.isPass ? `<span class="badge bg-success fs-6"><i class="fa-solid fa-check"></i> ${r.score}</span>` : `<span class="badge bg-danger fs-6"><i class="fa-solid fa-xmark"></i> 0</span>`);
+            tbody.innerHTML += `<tr><td class="fw-bold px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name}</td><td class="px-2 px-md-3"><div class="formula-box">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
+        });
+    }
+
+    function renderDashboard() {
+        document.getElementById('dashSyncStatus').innerText = 'อัปเดตแล้วเมื่อ ' + new Date().toLocaleTimeString();
+        const months = Object.keys(dbData).sort(); let scores = months.map(m => evaluateMonth(m).totalScore);
+        var options = { series: [{ name: 'คะแนนรวม', data: scores }], chart: { type: 'area', height: 280, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { curve: 'smooth', width: 3 }, fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } }, xaxis: { categories: months }, yaxis: { min: 0, max: 15 }, colors: ['#0e2b5c'], dataLabels: { enabled: true, formatter: function(val) { return val.toFixed(1); }, style: { colors: ['#0e2b5c'] } } };
+        if (chartInstances['totalScore']) chartInstances['totalScore'].destroy();
+        chartInstances['totalScore'] = new ApexCharts(document.querySelector("#totalScoreChart"), options); chartInstances['totalScore'].render();
+    }
+
+    function renderDashboardInsights() {
+        const m = document.getElementById('insightMonth').value; const evalData = evaluateMonth(m);
+        document.getElementById('insightScoreShow').innerText = evalData.totalScore.toFixed(1);
+        const listDiv = document.getElementById('insightList'); listDiv.innerHTML = ''; let hasInsight = false;
+        evalData.results.forEach(r => {
+            if (!r.isPass) {
+                hasInsight = true; let icon = r.isMissing ? '<i class="fa-solid fa-triangle-exclamation text-warning fs-4"></i>' : '<i class="fa-solid fa-circle-xmark text-danger fs-4"></i>'; let borderClass = r.isMissing ? 'insight-miss' : 'insight-fail'; let reason = r.isMissing ? 'ยังกรอกตัวแปรดิบไม่ครบ' : `ผลลัพธ์: ${r.value.toLocaleString(undefined, {maximumFractionDigits:2})} ${r.unit} (เป้า: ${r.target})`;
+                listDiv.innerHTML += `<div class="insight-item ${borderClass}"><div class="pe-2">${icon}</div><div class="flex-grow-1"><div class="fw-bold" style="color: #0e2b5c; font-size:0.9rem;">${r.id} ${r.name}</div><div class="text-muted" style="font-size:0.8rem;">${reason}</div></div></div>`;
+            }
+        });
+        if(!hasInsight) listDiv.innerHTML = '<div class="text-center text-success py-3"><i class="fa-solid fa-circle-check fs-2 mb-2"></i><br>ยอดเยี่ยม! ผ่านเกณฑ์ทุกตัวชี้วัดในเดือนนี้</div>';
+    }
+
+    function openRunChart(indicatorId) {
+        const dummyEval = evaluateMonth(document.getElementById('insightMonth').value).results.find(r => r.id === indicatorId);
+        document.getElementById('chartModalTitle').innerHTML = `<i class="fa-solid fa-chart-line me-2"></i>${dummyEval ? dummyEval.name : 'Run Chart'}`;
+        const months = Object.keys(dbData).sort(); 
+        let seriesData = months.map(m => { let res = evaluateMonth(m).results.find(r => r.id === indicatorId); return res && !res.isMissing ? parseFloat(res.value.toFixed(2)) : null; });
+        var options = { series: [{ name: 'ผลลัพธ์', data: seriesData }], chart: { type: 'line', height: 350, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { width: 4, curve: 'straight' }, xaxis: { categories: months }, markers: { size: 6, hover: { size: 8 } }, colors: ['#c5a059'] };
+        if (chartInstances['modalChart']) chartInstances['modalChart'].destroy();
+        chartInstances['modalChart'] = new ApexCharts(document.querySelector("#apexRunChart"), options); chartInstances['modalChart'].render();
+        var myModal = new bootstrap.Modal(document.getElementById('chartModal')); myModal.show();
+    }
+
+    document.getElementById('configForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); const payload = { action: 'update_config', configs: { 'MEAN_UC_OPD': cf_MEAN_UC_OPD.value, 'MEAN_UC_IPD': cf_MEAN_UC_IPD.value, 'MEAN_LC': cf_MEAN_LC.value, 'MEAN_MC_MED': cf_MEAN_MC_MED.value, 'MEAN_MC_OTHER': cf_MEAN_MC_OTHER.value, 'MEAN_ADJRW': cf_MEAN_ADJRW.value, 'MEAN_OP_MARGIN': cf_MEAN_OP_MARGIN.value, 'MEAN_ROA': cf_MEAN_ROA.value } };
+        try { await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }); fetchAllData(); } catch(err) {}
+    });
 </script>
 </body>
 </html>
