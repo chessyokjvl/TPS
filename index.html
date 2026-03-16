@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; transition: background-color 0.5s ease; overflow-x: hidden; }
+        
         .login-bg { background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .login-bg::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(14, 43, 92, 0.95) 0%, rgba(26, 72, 138, 0.85) 100%); z-index: 1; }
         #loginContainer { z-index: 2; position: relative; width: 100%; }
@@ -44,7 +45,11 @@
         .insight-fail { border-left-color: #dc3545; }
         .insight-miss { border-left-color: #ffc107; }
         
-        @media (max-width: 768px) { .container-fluid { padding-left: 10px; padding-right: 10px; } .card-body { padding: 15px; } .formula-box { font-size: 0.75rem; } }
+        .btn-grid-chart { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 100px; font-size: 0.9rem; padding: 15px 5px; transition: all 0.2s;}
+        .btn-grid-chart:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .btn-grid-chart i { font-size: 1.8rem; margin-bottom: 8px; }
+
+        @media (max-width: 768px) { .container-fluid { padding-left: 10px; padding-right: 10px; } .card-body { padding: 15px; } .formula-box { font-size: 0.75rem; } .btn-grid-chart { font-size: 0.8rem; min-height: 90px; } }
     </style>
 </head>
 <body class="login-bg" id="bodyTag">
@@ -110,16 +115,37 @@
                 </div>
             </div>
             
-            <h5 class="fw-bold mt-4 mb-3" style="color: #0e2b5c;"><i class="fa-solid fa-magnifying-glass-chart me-2"></i>เจาะลึกตัวชี้วัดสำคัญ (Control & Run Chart)</h5>
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3"><button class="btn btn-outline-primary w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.1.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Unit Cost OPD</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-primary w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.1.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Unit Cost IPD</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-success w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.1.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Operating Margin</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-success w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.1.3')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Return on Asset (ROA)</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-warning text-dark w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('1.2.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>ระยะเวลาชำระหนี้</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-warning text-dark w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('1.2.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>เรียกเก็บหนี้ UC</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-danger w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('2.3.1')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>อัตราครองเตียง</button></div>
-                <div class="col-6 col-md-3"><button class="btn btn-outline-danger w-100 py-3 shadow-sm fw-bold" onclick="openRunChart('3.2.2')"><i class="fa-solid fa-chart-line d-block fs-3 mb-2"></i>Cash Ratio</button></div>
+            <div class="card shadow-sm mt-2" style="border-top: 4px solid #6c757d;">
+                <div class="card-header bg-white py-3"><span class="fw-bold"><i class="fa-solid fa-border-all me-2"></i>เจาะลึก 18 ตัวชี้วัด (คลิกเพื่อดู Run Chart)</span></div>
+                <div class="card-body bg-light">
+                    <h6 class="fw-bold text-primary mb-3">1. การบริหารแผนและสภาพคล่อง</h6>
+                    <div class="row g-2 mb-4">
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.1.1')"><i class="fa-solid fa-file-invoice-dollar"></i><span>วินัยฯ (รับ)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.1.2')"><i class="fa-solid fa-file-invoice"></i><span>วินัยฯ (จ่าย)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.2.1')"><i class="fa-solid fa-hand-holding-dollar"></i><span>ชำระหนี้</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.2.2')"><i class="fa-solid fa-file-medical"></i><span>เรียกเก็บ UC</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.2.3')"><i class="fa-solid fa-building-columns"></i><span>เรียกเก็บ จ่ายตรง</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-primary w-100 btn-grid-chart bg-white" onclick="openRunChart('1.2.4')"><i class="fa-solid fa-boxes-stacked"></i><span>สินค้าคงคลัง</span></button></div>
+                    </div>
+                    <h6 class="fw-bold text-success mb-3">2. ต้นทุนและประสิทธิภาพ</h6>
+                    <div class="row g-2 mb-4">
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.1.1')"><i class="fa-solid fa-stethoscope"></i><span>Unit Cost OPD</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.1.2')"><i class="fa-solid fa-bed-pulse"></i><span>Unit Cost IPD</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.2.1')"><i class="fa-solid fa-users"></i><span>ค่าแรง (LC)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.2.2')"><i class="fa-solid fa-pills"></i><span>ค่ายา (MC Med)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.2.3')"><i class="fa-solid fa-syringe"></i><span>ค่าวัสดุ (MC Other)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.3.1')"><i class="fa-solid fa-bed"></i><span>อัตราครองเตียง</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-success w-100 btn-grid-chart bg-white" onclick="openRunChart('2.3.2')"><i class="fa-solid fa-chart-column"></i><span>Sum AdjRW</span></button></div>
+                    </div>
+                    <h6 class="fw-bold text-warning mb-3" style="color: #d39e00 !important;">3. ความสามารถในการทำกำไร</h6>
+                    <div class="row g-2">
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-warning text-dark w-100 btn-grid-chart bg-white" onclick="openRunChart('3.1.1')"><i class="fa-solid fa-money-bill-trend-up"></i><span>กำไรดำเนินงาน</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-warning text-dark w-100 btn-grid-chart bg-white" onclick="openRunChart('3.1.2')"><i class="fa-solid fa-percent"></i><span>Operating Margin</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-warning text-dark w-100 btn-grid-chart bg-white" onclick="openRunChart('3.1.3')"><i class="fa-solid fa-arrow-trend-up"></i><span>ROA</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-warning text-dark w-100 btn-grid-chart bg-white" onclick="openRunChart('3.2.1')"><i class="fa-solid fa-vault"></i><span>ทุนสำรอง (NWC)</span></button></div>
+                        <div class="col-4 col-md-3 col-xl-2"><button class="btn btn-outline-warning text-dark w-100 btn-grid-chart bg-white" onclick="openRunChart('3.2.2')"><i class="fa-solid fa-coins"></i><span>Cash Ratio</span></button></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -149,9 +175,12 @@
 
         <div class="tab-pane fade" id="calculation">
             <div class="card shadow-sm border-top border-success border-4">
-                <div class="card-header d-flex justify-content-between align-items-center py-3">
+                <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 py-3">
                     <span class="fs-5 text-success fw-bold"><i class="fa-solid fa-table-list me-2"></i>ผลการประเมิน 18 ข้อย่อย</span>
-                    <input type="month" class="form-control form-control-sm border-success w-auto" id="calcMonth" onchange="renderCalculationTab()">
+                    <div class="d-flex align-items-center bg-light p-2 rounded border w-100 w-md-auto">
+                        <label class="me-2 mb-0 fw-bold text-success text-nowrap">ดูผลเดือน:</label>
+                        <input type="month" class="form-control form-control-sm border-success flex-grow-1" id="calcMonth" onchange="renderCalculationTab()">
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive"><table class="table table-hover table-bordered mb-0 bg-white"><thead class="table-calc text-center align-middle"><tr><th class="min-w-indicator py-3">ตัวชี้วัด</th><th class="min-w-formula py-3">วิธีคำนวณ (จากระบบ)</th><th class="py-3">ผลลัพธ์</th><th class="py-3">เป้าหมาย</th><th class="py-3">คะแนน</th></tr></thead><tbody id="calcGrid" class="align-middle"></tbody></table></div>
@@ -160,17 +189,29 @@
         </div>
 
         <div class="tab-pane fade" id="config">
-            <div class="row justify-content-center"><div class="col-12 col-lg-10"><div class="card shadow-sm border-top border-danger border-4"><div class="card-header bg-white text-danger fw-bold py-3"><i class="fa-solid fa-sliders me-2"></i> ตั้งค่าค่ากลาง (Group Mean)</div><div class="card-body p-3 p-md-4">
-                <form id="configForm"><div class="row g-3">
-                    <div class="col-12 col-md-6"><label class="small fw-bold">Unit Cost OPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_OPD" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">Unit Cost IPD</label><input type="number" class="form-control border-danger" id="cf_MEAN_UC_IPD" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่าแรง (LC)</label><input type="number" class="form-control border-danger" id="cf_MEAN_LC" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่ายา (MC Med)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_MED" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">ค่าวัสดุอื่นๆ (MC อื่นๆ)</label><input type="number" class="form-control border-danger" id="cf_MEAN_MC_OTHER" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">Sum AdjRW</label><input type="number" class="form-control border-danger" id="cf_MEAN_ADJRW" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">Operating Margin (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_OP_MARGIN" required></div>
-                    <div class="col-12 col-md-6"><label class="small fw-bold">ROA (%)</label><input type="number" step="0.01" class="form-control border-danger" id="cf_MEAN_ROA" required></div>
-                </div><button type="submit" class="btn btn-danger w-100 mt-4 fw-bold shadow-sm py-3" id="btnSaveConfig">บันทึกอัปเดต</button></form>
+            <div class="row justify-content-center"><div class="col-12 col-lg-10"><div class="card shadow-sm border-top border-danger border-4"><div class="card-header bg-white text-danger fw-bold py-3"><i class="fa-solid fa-sliders me-2"></i> ตั้งค่าระบบ & ค่ากลาง (Admin Only)</div><div class="card-body p-3 p-md-4">
+                <form id="configForm">
+                    <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">แผนงบประมาณและข้อมูลพื้นฐาน</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">แผนรายรับ "ทั้งปี" (บาท)</label><input type="number" class="form-control form-control-lg border-primary" id="cf_PLAN_REV_YEAR" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">แผนรายจ่าย "ทั้งปี" (บาท)</label><input type="number" class="form-control form-control-lg border-primary" id="cf_PLAN_EXP_YEAR" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">จำนวนเตียงที่เปิดให้บริการ (Default)</label><input type="number" class="form-control form-control-lg border-primary" id="cf_BED_COUNT" value="120" required></div>
+                    </div>
+                    
+                    <h6 class="fw-bold text-danger mb-3 border-bottom pb-2">ค่ากลางของกลุ่มโรงพยาบาล (Group Mean)</h6>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง Unit Cost OPD</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_UC_OPD" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง Unit Cost IPD</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_UC_IPD" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลางค่าแรง (LC)</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_LC" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลางค่ายา (MC Med)</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_MC_MED" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลางค่าวัสดุอื่นๆ (MC อื่นๆ)</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_MC_OTHER" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง Sum AdjRW</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_ADJRW" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง Operating Margin (%)</label><input type="number" step="0.01" class="form-control form-control-lg border-danger" id="cf_MEAN_OP_MARGIN" required></div>
+                        <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง ROA (%)</label><input type="number" step="0.01" class="form-control form-control-lg border-danger" id="cf_MEAN_ROA" required></div>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-lg w-100 mt-4 fw-bold shadow-sm" id="btnSaveConfig" style="padding: 15px;"><i class="fa-solid fa-check-double me-2"></i>บันทึกการตั้งค่าทั้งหมด</button>
+                </form>
+                <div id="configAlert" class="alert mt-3 d-none text-center fw-bold rounded-3"></div>
             </div></div></div></div>
         </div>
     </div>
@@ -191,21 +232,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ========================================================
-    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่
+    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่ ⚠️
     // ========================================================
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwpobFeDDuv-xg_Nu6X0vIsVyQXTn_-pBX6D08150ydlKd1LEI_g6j1dvRKfiYZdxS/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY4RBJNIqC_OVTUPcoRFJrsVR8FonItmWwLQzRq6KE54NTmlgMwKPyYX0AaC1VbDgs/exec';
     
     let currentUserRole = ''; let currentDeptName = '';
     let dbData = {}; let globalConfig = {}; 
     let chartInstances = {};
 
+    // โครงสร้างตัวแปร (ตัดแผนและวันออก เหลือ 4 กลุ่มงาน)
     const varGroups = [
-        { id: 1, title: 'กลุ่มที่ 1: แผนประมาณการ (กรอกเดือนตุลาคม)', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'PLAN_REV_YEAR', desc: 'แผนประมาณการรายรับ "ทั้งปี" (1.1.1)' }, { code: 'PLAN_EXP_YEAR', desc: 'แผนประมาณการรายจ่าย "ทั้งปี" (1.1.2)' } ] },
-        { id: 2, title: 'กลุ่มที่ 2: ข้อมูลพื้นฐานประจำเดือน', roles: ['ADMIN', 'FINANCE', 'INSURANCE', 'PHARMACY', 'MEDSTAT'], vars: [ { code: 'DAYS_IN_MONTH', desc: 'จำนวนวันของเดือนนี้ (เช่น 30 หรือ 31)' } ] },
-        { id: 3, title: 'กลุ่มที่ 3: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (2.1.1, 2.1.2)' } ] },
-        { id: 4, title: 'กลุ่มที่ 4: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์งวดนี้ (1.2.4)' } ] },
-        { id: 5, title: 'กลุ่มที่ 5: การเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (1.1.1, 3.1.3)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (1.1.2, 3.1.3)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (1.2.1)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (1.2.1)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมดงวดนี้ (1.2.1)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) รวม (2.1.1, 2.1.2, 2.2.1)' }, { code: 'EXP_MC_MED', desc: 'ค่ายา/เวชภัณฑ์มิใช่ยา (MC ยา) (2.2.2, 2.1.1, 2.1.2)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (2.2.3, 2.1.1, 2.1.2)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (3.1.1, 3.1.2)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อม/ตัดจำหน่ายของพัสดุ (3.1.1, 3.1.2, 2.1.1, 2.1.2)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (3.1.2)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (3.1.2)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (3.1.3, 3.2.1)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (3.1.3)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (3.2.1)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (3.2.1, 3.2.2)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (3.2.1)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (3.2.1)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (3.2.1)' }, { code: 'CASH', desc: 'เงินสด (3.2.2)' }, { code: 'CASH_EQ', desc: 'เทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (3.2.2)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (3.2.2)' } ] },
-        { id: 6, title: 'กลุ่มที่ 6: สารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (2.1.1)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (2.1.2, 2.3.2)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (2.3.1)' }, { code: 'BED_COUNT', desc: 'จำนวนเตียง (ค่า Default: 120) (2.3.1)' } ] }
+        { id: 1, title: 'กลุ่มที่ 1: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (2.1.1, 2.1.2)' } ] },
+        { id: 2, title: 'กลุ่มที่ 2: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์งวดนี้ (1.2.4)' } ] },
+        { id: 3, title: 'กลุ่มที่ 3: การเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (1.1.1, 3.1.3)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (1.1.2, 3.1.3)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (1.2.1)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (1.2.1)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมดงวดนี้ (1.2.1)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) รวม (2.1.1, 2.1.2, 2.2.1)' }, { code: 'EXP_MC_MED', desc: 'ค่ายา/เวชภัณฑ์มิใช่ยา (MC ยา) (2.2.2, 2.1.1, 2.1.2)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (2.2.3, 2.1.1, 2.1.2)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (3.1.1, 3.1.2)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อม/ตัดจำหน่ายของพัสดุ (3.1.1, 3.1.2, 2.1.1, 2.1.2)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (3.1.2)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (3.1.2)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (3.1.3, 3.2.1)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (3.1.3)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (3.2.1)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (3.2.1, 3.2.2)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (3.2.1)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (3.2.1)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (3.2.1)' }, { code: 'CASH', desc: 'เงินสด (3.2.2)' }, { code: 'CASH_EQ', desc: 'เทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (3.2.2)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (3.2.2)' } ] },
+        { id: 4, title: 'กลุ่มที่ 4: สารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (2.1.1)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (2.1.2, 2.3.2)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (2.3.1)' } ] }
     ];
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -235,8 +275,7 @@
             if (group.roles.includes(currentUserRole) || currentUserRole === 'ADMIN') {
                 tbody.innerHTML += `<tr class="group-header-row" data-group-id="${group.id}"><td colspan="3" class="group-header py-2 px-3"><i class="fa-regular fa-folder-open me-2"></i>${group.title}</td></tr>`;
                 group.vars.forEach(v => {
-                    let ph = v.code === 'BED_COUNT' ? 'placeholder="120"' : '';
-                    tbody.innerHTML += `<tr class="var-row" data-group-id="${group.id}"><td class="fw-bold px-2 px-md-3" style="color: #0e2b5c;">${v.code}</td><td class="text-secondary px-2 px-md-3" style="font-size:0.9rem;">${v.desc}</td><td class="px-2 px-md-3"><input type="number" class="form-control var-input fw-bold text-end" id="inp_${v.code}" data-code="${v.code}" step="0.01" ${ph} oninput="updateColor(this)"></td></tr>`;
+                    tbody.innerHTML += `<tr class="var-row" data-group-id="${group.id}"><td class="fw-bold px-2 px-md-3" style="color: #0e2b5c;">${v.code}</td><td class="text-secondary px-2 px-md-3" style="font-size:0.9rem;">${v.desc}</td><td class="px-2 px-md-3"><input type="number" class="form-control form-control-lg var-input fw-bold text-end shadow-sm" id="inp_${v.code}" data-code="${v.code}" step="0.01" oninput="updateColor(this)"></td></tr>`;
                 });
             }
         });
@@ -256,7 +295,7 @@
                 for(let key in globalConfig) { let el = document.getElementById('cf_' + key); if(el) el.value = globalConfig[key]; }
                 loadDataForMonth(); renderCalculationTab(); renderDashboard(); renderDashboardInsights();
             }
-        } catch (e) { console.error(e); }
+        } catch (e) {}
     }
 
     function loadDataForMonth() {
@@ -274,11 +313,21 @@
         btn.disabled = false;
     });
 
-    // CORE ENGINE (ใช้ PLAN_REV รายเดือนที่หลังบ้านส่งมาแล้ว)
+    // ==========================================
+    // CORE ENGINE (ดึงค่า Plan, Bed และ Days อัตโนมัติ)
+    // ==========================================
     function evaluateMonth(monthStr) {
         const d = dbData[monthStr] || {}; 
-        const planRevMo = parseFloat(d.PLAN_REV || 0); // Backend หาร 12 มาให้แล้ว
-        const planExpMo = parseFloat(d.PLAN_EXP || 0); // Backend หาร 12 มาให้แล้ว
+        
+        // 1. คำนวณวันของเดือนนี้อัตโนมัติ
+        const mParts = monthStr.split('-');
+        const daysInMonth = new Date(parseInt(mParts[0]), parseInt(mParts[1]), 0).getDate();
+        
+        // 2. ดึงค่าคงที่จาก Config
+        const planRevMo = parseFloat(globalConfig.PLAN_REV_YEAR || 0) / 12;
+        const planExpMo = parseFloat(globalConfig.PLAN_EXP_YEAR || 0) / 12;
+        const bedCount = parseFloat(globalConfig.BED_COUNT || 120);
+
         const has = (...keys) => keys.every(k => d[k] !== undefined && d[k] !== '');
         const v = (code) => parseFloat(d[code] || 0);
 
@@ -288,35 +337,35 @@
             results.push({ id, name, formula: form, value: val, unit, target, isPass, score: s, scoreMax, isMissing });
         };
 
-        // 1.1 วินัยทางการเงิน
-        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รายรับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(2)})/${planRevMo.toFixed(2)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รายรับ)', 'รอตัวแปร: ACTUAL_REV, แผน', NaN, '%', '+/- 5%', false, 0, 1, true);
-        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (รายจ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(2)})/${planExpMo.toFixed(2)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (รายจ่าย)', 'รอตัวแปร: ACTUAL_EXP, แผน', NaN, '%', '+/- 5%', false, 0, 1, true);
+        // 1.1
+        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(0)})/${planRevMo.toFixed(0)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', '+/- 5%', false, 0, 1, true);
+        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(0)})/${planExpMo.toFixed(0)})*100`, val, '%', '+/- 5%', Math.abs(val)<=5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', '+/- 5%', false, 0, 1, true);
         
-        // 1.2 ชำระหนี้
-        if (has('DAYS_IN_MONTH', 'AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${v('DAYS_IN_MONTH')}*${avg})/${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 90', false, 0, 1, true);
-        if (has('DAYS_IN_MONTH', 'AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${v('DAYS_IN_MONTH')}*${avg})/${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
-        if (has('DAYS_IN_MONTH', 'AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${v('DAYS_IN_MONTH')}*${avg})/${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
-        if (has('DAYS_IN_MONTH', 'INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${v('DAYS_IN_MONTH')}*${avg})/${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.4', 'สินค้าคงคลัง', 'รอข้อมูลตัวแปร', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        // 1.2 (ใช้ daysInMonth อัตโนมัติ)
+        if (has('AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(daysInMonth*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${daysInMonth}*${avg})/${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, true);
+        if (has('AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(daysInMonth*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${daysInMonth}*${avg})/${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(daysInMonth*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${daysInMonth}*${avg})/${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(daysInMonth*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${daysInMonth}*${avg})/${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.4', 'สินค้าคงคลัง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
 
-        // 2. ต้นทุน
+        // 2
         let tc = v('EXP_LC')+v('EXP_MC_MED')+v('EXP_MC_OTHER')+v('EXP_DEP_AMORT'); let tr = v('REV_OP')+v('REV_IP') || 1;
-        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')}/${tr})*${tc})/${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1); } else pushResult('2.1.1', 'Unit Cost OPD', 'รอข้อมูลตัวแปร', NaN, 'บาท', '<= Mean', false, 0, 1, true);
-        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')}/${tr})*${tc})/${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1); } else pushResult('2.1.2', 'Unit Cost IPD', 'รอข้อมูลตัวแปร', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')}/${tr})*${tc})/${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1); } else pushResult('2.1.1', 'Unit Cost OPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')}/${tr})*${tc})/${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1); } else pushResult('2.1.2', 'Unit Cost IPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
         
-        if (has('EXP_LC')) pushResult('2.2.1', 'ค่าแรง (LC)', '-', v('EXP_LC'), 'บาท', '<= Mean', v('EXP_LC')<=(globalConfig.MEAN_LC||0), 0.5, 0.5); else pushResult('2.2.1', 'ค่าแรง (LC)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
-        if (has('EXP_MC_MED')) pushResult('2.2.2', 'ค่ายา (MC Med)', '-', v('EXP_MC_MED'), 'บาท', '<= Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5, 0.5); else pushResult('2.2.2', 'ค่ายา (MC Med)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
-        if (has('EXP_MC_OTHER')) pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', v('EXP_MC_OTHER'), 'บาท', '<= Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5, 0.5); else pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', 'รอข้อมูล', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
+        if (has('EXP_LC')) pushResult('2.2.1', 'ค่าแรง (LC)', '-', v('EXP_LC'), 'บาท', '<= Mean', v('EXP_LC')<=(globalConfig.MEAN_LC||0), 0.5, 0.5); else pushResult('2.2.1', 'ค่าแรง (LC)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
+        if (has('EXP_MC_MED')) pushResult('2.2.2', 'ค่ายา (MC Med)', '-', v('EXP_MC_MED'), 'บาท', '<= Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5, 0.5); else pushResult('2.2.2', 'ค่ายา (MC Med)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
+        if (has('EXP_MC_OTHER')) pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', v('EXP_MC_OTHER'), 'บาท', '<= Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5, 0.5); else pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
 
-        if (has('BED_DAYS', 'DAYS_IN_MONTH')) { let bed = v('BED_COUNT')||120; let val=(v('BED_DAYS')*100)/(bed*v('DAYS_IN_MONTH')); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')}*100)/(${bed}*${v('DAYS_IN_MONTH')})`, val, '%', '> 80%', val>80, 1, 1); } else pushResult('2.3.1', 'อัตราครองเตียง', 'รอข้อมูลตัวแปร', NaN, '%', '> 80%', false, 0, 1, true);
-        if (has('SUM_ADJRW')) pushResult('2.3.2', 'Sum AdjRW', '-', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1, 1); else pushResult('2.3.2', 'Sum AdjRW', 'รอข้อมูล', NaN, 'หน่วย', '> Mean', false, 0, 1, true);
+        if (has('BED_DAYS')) { let val=(v('BED_DAYS')*100)/(bedCount*daysInMonth); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')}*100)/(${bedCount}*${daysInMonth})`, val, '%', '> 80%', val>80, 1, 1); } else pushResult('2.3.1', 'อัตราครองเตียง', '-', NaN, '%', '> 80%', false, 0, 1, true);
+        if (has('SUM_ADJRW')) pushResult('2.3.2', 'Sum AdjRW', '-', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1, 1); else pushResult('2.3.2', 'Sum AdjRW', '-', NaN, 'หน่วย', '> Mean', false, 0, 1, true);
 
-        // 3. กำไร
+        // 3
         let opRev = v('ACTUAL_REV')-v('REV_DEP_NHSO'); let opExp = v('ACTUAL_EXP')-v('EXP_DEP_AMORT');
-        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev-opExp; pushResult('3.1.1', 'กำไรดำเนินงาน', `(${v('ACTUAL_REV')}-${v('REV_DEP_NHSO')}) - (${v('ACTUAL_EXP')}-${v('EXP_DEP_AMORT')})`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.1.1', 'กำไรดำเนินงาน', 'รอข้อมูลตัวแปร', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let div=v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val=((opRev-opExp)/div)*100; pushResult('3.1.2', 'Operating Margin', `(${(opRev-opExp)}/${div})*100`, val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1, 1); } else pushResult('3.1.2', 'Operating Margin', 'รอข้อมูลตัวแปร', NaN, '%', '> Mean', false, 0, 1, true);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let val=((v('ACTUAL_REV')-v('ACTUAL_EXP'))/(v('ASSET_CUR')+v('ASSET_NON_CUR')))*100; pushResult('3.1.3', 'ROA', `(${v('ACTUAL_REV')-v('ACTUAL_EXP')}/${v('ASSET_CUR')+v('ASSET_NON_CUR')})*100`, val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1, 1); } else pushResult('3.1.3', 'ROA', 'รอข้อมูลตัวแปร', NaN, '%', '> Mean', false, 0, 1, true);
-        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let val=(v('ASSET_CUR')-v('DONATION_FUND'))-(v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC'))); pushResult('3.2.1', 'ทุนสำรองสุทธิ', `(${v('ASSET_CUR')}-${v('DONATION_FUND')}) - (${v('LIAB_CUR')}-...)`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.2.1', 'ทุนสำรองสุทธิ', 'รอข้อมูลตัวแปร', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
-        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let val=(v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'))/v('LIAB_CUR'); pushResult('3.2.2', 'Cash Ratio', `(${v('CASH')}+${v('CASH_EQ')}+${v('FIXED_DEPOSIT')}) / ${v('LIAB_CUR')}`, val, 'เท่า', '>= 0.8', val>=0.8, 1, 1); } else pushResult('3.2.2', 'Cash Ratio', 'รอข้อมูลตัวแปร', NaN, 'เท่า', '>= 0.8', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev-opExp; pushResult('3.1.1', 'กำไรดำเนินงาน', '-', val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.1.1', 'กำไรดำเนินงาน', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let div=v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val=((opRev-opExp)/div)*100; pushResult('3.1.2', 'Operating Margin', '-', val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1, 1); } else pushResult('3.1.2', 'Operating Margin', '-', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let val=((v('ACTUAL_REV')-v('ACTUAL_EXP'))/(v('ASSET_CUR')+v('ASSET_NON_CUR')))*100; pushResult('3.1.3', 'ROA', '-', val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1, 1); } else pushResult('3.1.3', 'ROA', '-', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let val=(v('ASSET_CUR')-v('DONATION_FUND'))-(v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC'))); pushResult('3.2.1', 'ทุนสำรองสุทธิ', '-', val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.2.1', 'ทุนสำรองสุทธิ', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let val=(v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'))/v('LIAB_CUR'); pushResult('3.2.2', 'Cash Ratio', '-', val, 'เท่า', '>= 0.8', val>=0.8, 1, 1); } else pushResult('3.2.2', 'Cash Ratio', '-', NaN, 'เท่า', '>= 0.8', false, 0, 1, true);
 
         return { totalScore, results };
     }
@@ -364,7 +413,11 @@
     }
 
     document.getElementById('configForm').addEventListener('submit', async (e) => {
-        e.preventDefault(); const payload = { action: 'update_config', configs: { 'MEAN_UC_OPD': cf_MEAN_UC_OPD.value, 'MEAN_UC_IPD': cf_MEAN_UC_IPD.value, 'MEAN_LC': cf_MEAN_LC.value, 'MEAN_MC_MED': cf_MEAN_MC_MED.value, 'MEAN_MC_OTHER': cf_MEAN_MC_OTHER.value, 'MEAN_ADJRW': cf_MEAN_ADJRW.value, 'MEAN_OP_MARGIN': cf_MEAN_OP_MARGIN.value, 'MEAN_ROA': cf_MEAN_ROA.value } };
+        e.preventDefault(); 
+        const payload = { action: 'update_config', configs: { 
+            'PLAN_REV_YEAR': cf_PLAN_REV_YEAR.value, 'PLAN_EXP_YEAR': cf_PLAN_EXP_YEAR.value, 'BED_COUNT': cf_BED_COUNT.value,
+            'MEAN_UC_OPD': cf_MEAN_UC_OPD.value, 'MEAN_UC_IPD': cf_MEAN_UC_IPD.value, 'MEAN_LC': cf_MEAN_LC.value, 'MEAN_MC_MED': cf_MEAN_MC_MED.value, 'MEAN_MC_OTHER': cf_MEAN_MC_OTHER.value, 'MEAN_ADJRW': cf_MEAN_ADJRW.value, 'MEAN_OP_MARGIN': cf_MEAN_OP_MARGIN.value, 'MEAN_ROA': cf_MEAN_ROA.value 
+        } };
         try { await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }); fetchAllData(); } catch(err) {}
     });
 </script>
