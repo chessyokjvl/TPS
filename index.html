@@ -50,9 +50,9 @@
         .btn-grid-chart:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
         .btn-grid-chart i { font-size: 1.8rem; margin-bottom: 8px; }
 
-        /* ป้ายกำกับประเภทเกณฑ์ */
         .badge-type-fixed { background-color: #e3f2fd; color: #0d6efd; border: 1px solid #b6effb; }
         .badge-type-mean { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .ytd-label { color: #d63384; font-weight: 700; font-size: 0.8rem; border: 1px solid #d63384; padding: 2px 6px; border-radius: 4px; margin-left: 8px; display: inline-block; }
 
         @media (max-width: 768px) { .container-fluid { padding-left: 10px; padding-right: 10px; } .card-body { padding: 15px; } .formula-box { font-size: 0.75rem; } .btn-grid-chart { font-size: 0.8rem; min-height: 90px; } }
     </style>
@@ -104,37 +104,34 @@
             <div class="row g-3">
                 <div class="col-12 col-lg-8">
                     <div class="card shadow-sm h-100" style="border-top: 4px solid #0e2b5c;">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center"><span class="fw-bold" style="color: #0e2b5c;"><i class="fa-solid fa-chart-area me-2"></i>คะแนนรวม 15 คะแนน (Trend)</span><span class="badge bg-primary rounded-pill px-3" id="dashSyncStatus">อัปเดตล่าสุด...</span></div>
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <span class="fw-bold" style="color: #0e2b5c;"><i class="fa-solid fa-chart-area me-2"></i>คะแนนรวม 15 คะแนน (Trend)</span>
+                            <span class="badge bg-primary rounded-pill px-3" id="dashSyncStatus">อัปเดตล่าสุด...</span>
+                        </div>
                         <div class="card-body"><div id="totalScoreChart"></div></div>
                     </div>
                 </div>
                 <div class="col-12 col-lg-4">
                     <div class="card shadow-sm h-100" style="border-top: 4px solid #dc3545;">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-danger"><i class="fa-solid fa-lightbulb me-2"></i>Insight รายเดือน</span>
-                            <input type="month" class="form-control form-control-sm w-auto" id="insightMonth" onchange="renderDashboardInsights()">
+                        <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <span class="fw-bold text-danger"><i class="fa-solid fa-lightbulb me-2"></i>Insight อัจฉริยะ</span>
+                            <div class="d-flex gap-2 w-100">
+                                <select class="form-select form-select-sm border-danger text-danger fw-bold" id="insightViewMode" onchange="renderDashboardInsights(); renderDashboard();">
+                                    <option value="MONTHLY">ดูยอดเฉพาะเดือนนี้</option>
+                                    <option value="YTD" selected>ดูยอดสะสมถึงเดือนนี้ (YTD)</option>
+                                </select>
+                                <input type="month" class="form-control form-control-sm border-danger" id="insightMonth" onchange="renderDashboardInsights(); renderDashboard();">
+                            </div>
                         </div>
                         <div class="card-body p-3" style="background-color: #f8f9fa;">
                             <div id="insightSummary" class="text-center mb-3 border-bottom pb-3">
                                 <h2 class="fw-bold mb-0" id="insightScoreShow">-</h2>
-                                <small class="text-muted">คะแนนรวมเดือนนี้ (เต็ม 15)</small>
-                                
+                                <small class="text-muted" id="insightScoreLabel">คะแนนรวมสะสม (เต็ม 15)</small>
                                 <div class="row mt-3 g-2">
-                                    <div class="col-6">
-                                        <div class="p-2 rounded bg-white border border-primary border-opacity-25 shadow-sm">
-                                            <div class="small fw-bold text-primary mb-1">เกณฑ์ตายตัว</div>
-                                            <div class="fs-5 fw-bold" id="insightFixedCount">0/10</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-2 rounded bg-white border border-warning border-opacity-50 shadow-sm">
-                                            <div class="small fw-bold text-warning text-dark mb-1">เทียบค่ากลาง</div>
-                                            <div class="fs-5 fw-bold" id="insightMeanCount">0/8</div>
-                                        </div>
-                                    </div>
+                                    <div class="col-6"><div class="p-2 rounded bg-white border border-primary border-opacity-25 shadow-sm"><div class="small fw-bold text-primary mb-1">เกณฑ์ตายตัว</div><div class="fs-5 fw-bold" id="insightFixedCount">0/10</div></div></div>
+                                    <div class="col-6"><div class="p-2 rounded bg-white border border-warning border-opacity-50 shadow-sm"><div class="small fw-bold text-warning text-dark mb-1">เทียบค่ากลาง</div><div class="fs-5 fw-bold" id="insightMeanCount">0/8</div></div></div>
                                 </div>
                             </div>
-                            
                             <h6 class="fw-bold text-muted mb-2"><i class="fa-solid fa-list-check me-2"></i>รายการที่ต้องติดตาม:</h6>
                             <div id="insightList" style="max-height: 200px; overflow-y: auto; padding-right: 5px;"></div>
                         </div>
@@ -177,6 +174,9 @@
         </div>
 
         <div class="tab-pane fade" id="input">
+            <div class="alert alert-warning mb-4 shadow-sm border-0 border-start border-5 border-warning fw-bold">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>ข้อควรระวัง: กรุณากรอกเฉพาะ "ยอดที่เกิดขึ้นในเดือนที่เลือกเท่านั้น" ห้ามนำยอดสะสมมาบวกเอง (ระบบจะคำนวณยอดสะสม YTD ให้อัตโนมัติ)
+            </div>
             <div class="card shadow-sm" style="border-top: 4px solid #0e2b5c;">
                 <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 py-3">
                     <span class="fs-5 fw-bold" style="color: #0e2b5c;"><i class="fa-solid fa-list-ul me-2"></i>ชุดปฏิบัติการบันทึกข้อมูล</span>
@@ -189,7 +189,7 @@
                     <form id="batchSaveForm">
                         <div class="table-responsive rounded shadow-sm border mb-3">
                             <table class="table table-bordered align-middle mb-0 bg-white">
-                                <thead class="text-center text-white" style="background-color: #1a488a;"><tr><th class="min-w-code py-2">รหัสตัวแปร</th><th class="min-w-desc py-2">คำอธิบาย</th><th class="min-w-input py-2">ค่าที่บันทึก</th></tr></thead>
+                                <thead class="text-center text-white" style="background-color: #1a488a;"><tr><th class="min-w-code py-2">รหัสตัวแปร</th><th class="min-w-desc py-2">คำอธิบาย</th><th class="min-w-input py-2">ค่าที่บันทึก (เฉพาะของเดือนนี้)</th></tr></thead>
                                 <tbody id="variableGrid"></tbody>
                             </table>
                         </div>
@@ -204,16 +204,15 @@
             <div class="card shadow-sm border-top border-success border-4">
                 <div class="card-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 py-3">
                     <span class="fs-5 text-success fw-bold"><i class="fa-solid fa-table-list me-2"></i>ผลการประเมิน 18 ข้อย่อย</span>
-                    <div class="d-flex align-items-center bg-light p-2 rounded border w-100 w-md-auto gap-2 flex-wrap flex-md-nowrap">
-                        <select class="form-select form-select-sm border-secondary flex-grow-1" id="calcTypeFilter" onchange="renderCalculationTab()">
-                            <option value="ALL">ดูทุกประเภท</option>
-                            <option value="FIXED">เฉพาะเกณฑ์ตายตัว (10 ข้อ)</option>
-                            <option value="MEAN">เฉพาะเทียบค่ากลาง (8 ข้อ)</option>
+                    <div class="d-flex flex-column flex-md-row align-items-center bg-light p-2 rounded border w-100 w-md-auto gap-2">
+                        <select class="form-select form-select-sm border-success text-success fw-bold flex-grow-1" id="calcViewMode" onchange="renderCalculationTab()">
+                            <option value="MONTHLY">ดูยอดเฉพาะเดือนนี้ (Monthly)</option>
+                            <option value="YTD" selected>ดูยอดสะสมถึงเดือนนี้ (YTD)</option>
                         </select>
-                        <div class="d-flex align-items-center flex-grow-1">
-                            <label class="me-2 mb-0 fw-bold text-success text-nowrap">เดือน:</label>
-                            <input type="month" class="form-control form-control-sm border-success w-100" id="calcMonth" onchange="renderCalculationTab()">
-                        </div>
+                        <select class="form-select form-select-sm border-secondary flex-grow-1" id="calcTypeFilter" onchange="renderCalculationTab()">
+                            <option value="ALL">ดูทุกประเภท</option><option value="FIXED">เฉพาะเกณฑ์ตายตัว</option><option value="MEAN">เฉพาะเทียบค่ากลาง</option>
+                        </select>
+                        <input type="month" class="form-control form-control-sm border-success w-100 w-md-auto" id="calcMonth" onchange="renderCalculationTab()">
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -231,7 +230,6 @@
                         <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">แผนรายจ่าย "ทั้งปี" (บาท)</label><input type="number" class="form-control form-control-lg border-primary" id="cf_PLAN_EXP_YEAR" required></div>
                         <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">จำนวนเตียงที่เปิดให้บริการ (Default)</label><input type="number" class="form-control form-control-lg border-primary" id="cf_BED_COUNT" value="120" required></div>
                     </div>
-                    
                     <h6 class="fw-bold text-danger mb-3 border-bottom pb-2">ค่ากลางของกลุ่มโรงพยาบาล (Group Mean)</h6>
                     <div class="row g-3">
                         <div class="col-12 col-md-6"><label class="small text-muted fw-bold mb-1">ค่ากลาง Unit Cost OPD</label><input type="number" class="form-control form-control-lg border-danger" id="cf_MEAN_UC_OPD" required></div>
@@ -274,11 +272,12 @@
     let dbData = {}; let globalConfig = {}; 
     let chartInstances = {};
 
+    // เพิ่มคำอธิบายกำกับการกรอก (ยอด Flow / ยอด Stock)
     const varGroups = [
-        { id: 1, title: 'กลุ่มที่ 1: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (1.2.2)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (1.2.2)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (1.2.2)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (1.2.3)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (1.2.3)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (1.2.3)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (2.1.1, 2.1.2)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (2.1.1, 2.1.2)' } ] },
-        { id: 2, title: 'กลุ่มที่ 2: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (1.2.4)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (1.2.4)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์งวดนี้ (1.2.4)' } ] },
-        { id: 3, title: 'กลุ่มที่ 3: การเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (1.1.1, 3.1.3)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (1.1.2, 3.1.3)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (1.2.1)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (1.2.1)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมดงวดนี้ (1.2.1)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) รวม (2.1.1, 2.1.2, 2.2.1)' }, { code: 'EXP_MC_MED', desc: 'ค่ายา/เวชภัณฑ์มิใช่ยา (MC ยา) (2.2.2, 2.1.1, 2.1.2)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (2.2.3, 2.1.1, 2.1.2)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (3.1.1, 3.1.2)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อม/ตัดจำหน่ายของพัสดุ (3.1.1, 3.1.2, 2.1.1, 2.1.2)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (3.1.2)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (3.1.2)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (3.1.3, 3.2.1)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (3.1.3)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (3.2.1)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (3.2.1, 3.2.2)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (3.2.1)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (3.2.1)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (3.2.1)' }, { code: 'CASH', desc: 'เงินสด (3.2.2)' }, { code: 'CASH_EQ', desc: 'เทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (3.2.2)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (3.2.2)' } ] },
-        { id: 4, title: 'กลุ่มที่ 4: สารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (2.1.1)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (2.1.2, 2.3.2)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (2.3.1)' } ] }
+        { id: 1, title: 'กลุ่มที่ 1: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' } ] },
+        { id: 2, title: 'กลุ่มที่ 2: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' } ] },
+        { id: 3, title: 'กลุ่มที่ 3: การเงินและบัญชี', roles: ['ADMIN', 'FINANCE'], vars: [ { code: 'ACTUAL_REV', desc: 'รายรับจริง (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'ACTUAL_EXP', desc: 'รายจ่ายจริง (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'AP_BEGIN', desc: 'ยอดหนี้ต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'AP_END', desc: 'ยอดหนี้ปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'AP_PURCHASE', desc: 'ยอดสั่งซื้อทั้งหมด (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'EXP_LC', desc: 'ค่าใช้จ่าย Labor Cost (LC) รวม (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'EXP_MC_MED', desc: 'ค่ายา/เวชภัณฑ์มิใช่ยา (MC ยา) (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'EXP_MC_OTHER', desc: 'ค่าวัสดุอื่นๆ (MC อื่นๆ) (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_DEP_NHSO', desc: 'งบลงทุนค่าเสื่อมจาก สปสช. (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'EXP_DEP_AMORT', desc: 'ค่าเสื่อม/ตัดจำหน่ายของพัสดุ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_GOV_BUDGET_HR', desc: 'งบประมาณส่วนบุคลากร (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_BUMRUNG', desc: 'รายรับเงินบำรุง (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'ASSET_CUR', desc: 'สินทรัพย์หมุนเวียน (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'ASSET_NON_CUR', desc: 'สินทรัพย์ไม่หมุนเวียน (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'DONATION_FUND', desc: 'เงินบริจาค (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'LIAB_CUR', desc: 'หนี้สินหมุนเวียน (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'AP_INVEST', desc: 'เจ้าหนี้งบลงทุน (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'AP_DONATION', desc: 'เจ้าหนี้เงินบริจาค (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'DEPOSIT_UC', desc: 'เงินรับฝากกองทุน UC (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'CASH', desc: 'เงินสด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'CASH_EQ', desc: 'เทียบเท่าเงินสด (ไม่รวมบริจาคฯ) (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'FIXED_DEPOSIT', desc: 'เงินฝากประจำ (ยอดคงเหลือ ณ สิ้นเดือน)' } ] },
+        { id: 4, title: 'กลุ่มที่ 4: สารสนเทศ (HOSxP)', roles: ['ADMIN', 'MEDSTAT'], vars: [ { code: 'OP_VISIT', desc: 'จำนวน OPD Visit (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'SUM_ADJRW', desc: 'Sum AdjRW (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'BED_DAYS', desc: 'จำนวนวันนอนรวม (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' } ] }
     ];
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -334,7 +333,10 @@
 
     function loadDataForMonth() {
         const m = document.getElementById('selectMonth').value; const d = dbData[m] || {};
-        document.querySelectorAll('.var-input').forEach(el => { el.value = d[el.dataset.code] !== undefined ? d[el.dataset.code] : ''; updateColor(el); }); filterGrid();
+        document.querySelectorAll('.var-input').forEach(el => {
+            el.value = d[el.dataset.code] !== undefined ? d[el.dataset.code] : ''; updateColor(el);
+        });
+        filterGrid();
     }
 
     document.getElementById('batchSaveForm').addEventListener('submit', async (e) => {
@@ -344,8 +346,7 @@
         try {
             const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'save_batch', report_month: document.getElementById('selectMonth').value, dept_name: currentDeptName, variables: payloadVars }) });
             const data = await res.json();
-            alertBox.className = `alert mt-4 alert-${data.status === 'success' ? 'success' : 'danger'}`; 
-            alertBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + data.message;
+            alertBox.className = `alert mt-4 alert-${data.status === 'success' ? 'success' : 'danger'}`; alertBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + data.message;
             if(data.status === 'success') fetchAllData(); 
         } catch(err) { alertBox.className = 'alert mt-4 alert-danger'; alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> เกิดข้อผิดพลาดในการบันทึก'; }
         alertBox.classList.remove('d-none'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>บันทึกข้อมูลเข้าสู่ระบบ';
@@ -353,18 +354,72 @@
     });
 
     // ==========================================
-    // CORE ENGINE (เพิ่มการส่งค่า evalType: 'FIXED' หรือ 'MEAN')
+    // CORE ENGINE (YTD Aggregation System)
     // ==========================================
-    function evaluateMonth(monthStr) {
-        const d = dbData[monthStr] || {}; 
+    // หวาดเดือนทั้งหมดตั้งแต่ ต.ค. ถึงเดือนที่เลือก (ในปีงบเดียวกัน)
+    function getFYMonthsUpTo(monthStr) {
+        let parts = monthStr.split('-'); let y = parseInt(parts[0]); let m = parseInt(parts[1]);
+        let startYear = m >= 10 ? y : y - 1; let result = [];
+        for(let i=10; i<=12; i++) { let im = `${startYear}-${String(i).padStart(2,'0')}`; result.push(im); if(im === monthStr) return result; }
+        for(let i=1; i<=9; i++) { let im = `${startYear+1}-${String(i).padStart(2,'0')}`; result.push(im); if(im === monthStr) return result; }
+        return result;
+    }
+
+    function getOctoberStr(mStr) {
+        if(!mStr) return ''; let p = mStr.split('-'); let y = parseInt(p[1])>=10 ? parseInt(p[0]) : parseInt(p[0])-1; return `${y}-10`;
+    }
+
+    // ฟังก์ชันรวบรวมตัวแปร (แยกรายเดือน vs สะสม YTD)
+    function aggregateData(selectedMonth, mode) {
+        if (mode === 'MONTHLY') return dbData[selectedMonth] || {};
+
+        let fyMonths = getFYMonthsUpTo(selectedMonth);
+        let dYTD = {};
         
+        // ตัวแปรแบบ Flow (ต้องจับบวกกัน)
+        let flowVars = ['ACTUAL_REV', 'ACTUAL_EXP', 'REV_UC', 'REV_CGD', 'REV_OP', 'REV_IP', 'EXP_LC', 'EXP_MC_MED', 'EXP_MC_OTHER', 'OP_VISIT', 'SUM_ADJRW', 'BED_DAYS', 'AP_PURCHASE', 'INV_DISPENSE', 'REV_DEP_NHSO', 'EXP_DEP_AMORT', 'REV_GOV_BUDGET_HR', 'REV_BUMRUNG'];
+        // ตัวแปรแบบ Stock (ดึงเฉพาะยอดสิ้นเดือนล่าสุดที่เลือก)
+        let stockEndVars = ['AP_END', 'AR_UC_END', 'AR_CGD_END', 'INV_END', 'ASSET_CUR', 'ASSET_NON_CUR', 'DONATION_FUND', 'LIAB_CUR', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT'];
+        // ตัวแปรแบบ Stock เริ่มต้น (ดึงเฉพาะยอดของเดือนตุลาคม)
+        let stockBeginVars = ['AP_BEGIN', 'AR_UC_BEGIN', 'AR_CGD_BEGIN', 'INV_BEGIN'];
+
+        let dRaw = dbData[selectedMonth] || {};
+        let dFirst = dbData[getOctoberStr(selectedMonth)] || {};
+
+        // รวม Flow
+        flowVars.forEach(v => {
+            let hasValue = false; let sum = 0;
+            fyMonths.forEach(m => {
+                if (dbData[m] && dbData[m][v] !== undefined && dbData[m][v] !== '') { hasValue = true; sum += parseFloat(dbData[m][v]); }
+            });
+            if (hasValue) dYTD[v] = sum;
+        });
+
+        // ดึง Stock ปลายงวด
+        stockEndVars.forEach(v => { if(dRaw[v] !== undefined) dYTD[v] = dRaw[v]; });
+        // ดึง Stock ต้นงวด (ของปีงบ)
+        stockBeginVars.forEach(v => { if(dFirst[v] !== undefined) dYTD[v] = dFirst[v]; });
+
+        // นับวันสะสมทั้งหมด
+        dYTD['DAYS_IN_MONTH'] = fyMonths.reduce((sum, m) => {
+            let parts = m.split('-'); return sum + new Date(parseInt(parts[0]), parseInt(parts[1]), 0).getDate();
+        }, 0);
+
+        return dYTD;
+    }
+
+    // คำนวณหลัก (รองรับ YTD/Monthly)
+    function evaluateMonth(monthStr, mode = 'YTD') {
+        const d = aggregateData(monthStr, mode);
         const mParts = monthStr.split('-'); const monthNum = parseInt(mParts[1]);
-        const daysInMonth = new Date(parseInt(mParts[0]), monthNum, 0).getDate();
         const fyMonthIndex = monthNum >= 10 ? monthNum - 9 : monthNum + 3;
 
+        // คำนวณแผน (ถ้าเป็นรายเดือน = /12, ถ้า YTD = สะสมตามเดือน)
         const planRevMo = parseFloat(globalConfig.PLAN_REV_YEAR || 0) / 12;
         const planExpMo = parseFloat(globalConfig.PLAN_EXP_YEAR || 0) / 12;
-        const planRevCum = planRevMo * fyMonthIndex; const planExpCum = planExpMo * fyMonthIndex;
+        const planRevTarget = mode === 'YTD' ? planRevMo * fyMonthIndex : planRevMo;
+        const planExpTarget = mode === 'YTD' ? planExpMo * fyMonthIndex : planExpMo;
+        
         const bedCount = parseFloat(globalConfig.BED_COUNT || 120);
 
         const has = (...keys) => keys.every(k => d[k] !== undefined && d[k] !== '');
@@ -377,16 +432,16 @@
         };
 
         // 1.1 FIXED
-        if (has('ACTUAL_REV') && planRevCum > 0) { let val = ((v('ACTUAL_REV')-planRevCum)/planRevCum)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')} - ${planRevCum.toFixed(0)}) / ${planRevCum.toFixed(0)}) * 100`, val, '%', 'ติดลบไม่เกิน 5%', val >= -5, 1, 1, 'FIXED'); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', 'ติดลบไม่เกิน 5%', false, 0, 1, 'FIXED', true);
-        if (has('ACTUAL_EXP') && planExpCum > 0) { let val = ((v('ACTUAL_EXP')-planExpCum)/planExpCum)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')} - ${planExpCum.toFixed(0)}) / ${planExpCum.toFixed(0)}) * 100`, val, '%', 'บวกไม่เกิน 5%', val <= 5, 1, 1, 'FIXED'); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', 'บวกไม่เกิน 5%', false, 0, 1, 'FIXED', true);
+        if (has('ACTUAL_REV') && planRevTarget > 0) { let val = ((v('ACTUAL_REV')-planRevTarget)/planRevTarget)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')} - ${planRevTarget.toFixed(0)}) / ${planRevTarget.toFixed(0)}) * 100`, val, '%', 'ติดลบไม่เกิน 5%', val >= -5, 1, 1, 'FIXED'); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', 'ติดลบไม่เกิน 5%', false, 0, 1, 'FIXED', true);
+        if (has('ACTUAL_EXP') && planExpTarget > 0) { let val = ((v('ACTUAL_EXP')-planExpTarget)/planExpTarget)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')} - ${planExpTarget.toFixed(0)}) / ${planExpTarget.toFixed(0)}) * 100`, val, '%', 'บวกไม่เกิน 5%', val <= 5, 1, 1, 'FIXED'); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', 'บวกไม่เกิน 5%', false, 0, 1, 'FIXED', true);
         
         // 1.2 FIXED
-        if (has('AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(daysInMonth*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${daysInMonth} * ${avg}) / ${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1, 'FIXED'); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, 'FIXED', true);
-        if (has('AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(daysInMonth*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${daysInMonth} * ${avg}) / ${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
-        if (has('AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(daysInMonth*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${daysInMonth} * ${avg}) / ${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
-        if (has('INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(daysInMonth*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${daysInMonth} * ${avg}) / ${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.4', 'สินค้าคงคลัง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
+        if (has('DAYS_IN_MONTH', 'AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1, 'FIXED'); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, 'FIXED', true);
+        if (has('DAYS_IN_MONTH', 'AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
+        if (has('DAYS_IN_MONTH', 'AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
+        if (has('DAYS_IN_MONTH', 'INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(v('DAYS_IN_MONTH')*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${v('DAYS_IN_MONTH')} * ${avg}) / ${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5, 'FIXED'); } else pushResult('1.2.4', 'สินค้าคงคลัง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, 'FIXED', true);
 
-        // 2 (Mean กับ Fixed ปนกัน)
+        // 2
         let tc = v('EXP_LC')+v('EXP_MC_MED')+v('EXP_MC_OTHER')+v('EXP_DEP_AMORT'); let tr = v('REV_OP')+v('REV_IP') || 1;
         if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')} / ${tr}) * ${tc}) / ${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1, 'MEAN'); } else pushResult('2.1.1', 'Unit Cost OPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, 'MEAN', true);
         if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')} / ${tr}) * ${tc}) / ${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1, 'MEAN'); } else pushResult('2.1.2', 'Unit Cost IPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, 'MEAN', true);
@@ -395,7 +450,7 @@
         if (has('EXP_MC_MED')) pushResult('2.2.2', 'ค่ายา (MC Med)', '-', v('EXP_MC_MED'), 'บาท', '<= Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5, 0.5, 'MEAN'); else pushResult('2.2.2', 'ค่ายา (MC Med)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, 'MEAN', true);
         if (has('EXP_MC_OTHER')) pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', v('EXP_MC_OTHER'), 'บาท', '<= Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5, 0.5, 'MEAN'); else pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, 'MEAN', true);
 
-        if (has('BED_DAYS')) { let val=(v('BED_DAYS')*100)/(bedCount*daysInMonth); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')} * 100) / (${bedCount} * ${daysInMonth})`, val, '%', '> 80%', val>80, 1, 1, 'FIXED'); } else pushResult('2.3.1', 'อัตราครองเตียง', '-', NaN, '%', '> 80%', false, 0, 1, 'FIXED', true);
+        if (has('BED_DAYS', 'DAYS_IN_MONTH')) { let val=(v('BED_DAYS')*100)/(bedCount*v('DAYS_IN_MONTH')); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')} * 100) / (${bedCount} * ${v('DAYS_IN_MONTH')})`, val, '%', '> 80%', val>80, 1, 1, 'FIXED'); } else pushResult('2.3.1', 'อัตราครองเตียง', '-', NaN, '%', '> 80%', false, 0, 1, 'FIXED', true);
         if (has('SUM_ADJRW')) pushResult('2.3.2', 'Sum AdjRW', '-', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1, 1, 'MEAN'); else pushResult('2.3.2', 'Sum AdjRW', '-', NaN, 'หน่วย', '> Mean', false, 0, 1, 'MEAN', true);
 
         // 3
@@ -409,38 +464,40 @@
         return { totalScore, results };
     }
 
-    // --- อัปเดต TAB 3 ให้ Filter ประเภทได้ ---
+    // --- อัปเดต TAB 3 ให้ดึง View Mode มาประมวลผล ---
     function renderCalculationTab() {
         const m = document.getElementById('calcMonth').value; 
-        const filterType = document.getElementById('calcTypeFilter').value; // ค่า ALL, FIXED, MEAN
-        const evalData = evaluateMonth(m);
+        const viewMode = document.getElementById('calcViewMode').value; // 'MONTHLY' หรือ 'YTD'
+        const filterType = document.getElementById('calcTypeFilter').value;
+        const evalData = evaluateMonth(m, viewMode);
         const tbody = document.getElementById('calcGrid'); tbody.innerHTML = '';
         
         evalData.results.forEach(r => {
-            if (filterType !== 'ALL' && r.evalType !== filterType) return; // กรองการแสดงผล
+            if (filterType !== 'ALL' && r.evalType !== filterType) return; 
             
             let resText = r.isMissing ? '<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> รอข้อมูล</span>' : r.value.toLocaleString(undefined, {maximumFractionDigits:2});
             let badge = r.isMissing ? `<span class="badge bg-secondary fs-6">-</span>` : (r.isPass ? `<span class="badge bg-success fs-6"><i class="fa-solid fa-check"></i> ${r.score}</span>` : `<span class="badge bg-danger fs-6"><i class="fa-solid fa-xmark"></i> 0</span>`);
             let typeBadge = r.evalType === 'FIXED' ? '<br><span class="badge badge-type-fixed mt-1" style="font-size:0.75rem;">เกณฑ์ตายตัว</span>' : '<br><span class="badge badge-type-mean mt-1" style="font-size:0.75rem;">เทียบค่ากลาง</span>';
+            let ytdBadge = viewMode === 'YTD' ? '<span class="ytd-label">ยอดสะสม YTD</span>' : '';
             
-            tbody.innerHTML += `<tr><td class="fw-bold text-start px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name} ${typeBadge}</td><td class="px-2 px-md-3"><div class="formula-box text-start">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
+            tbody.innerHTML += `<tr><td class="fw-bold text-start px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name} ${typeBadge}</td><td class="px-2 px-md-3"><div class="formula-box text-start">${r.formula} ${ytdBadge}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
         });
     }
 
-    // --- อัปเดต Dashboard ให้แสดงสรุปแยกตามเกณฑ์ ---
+    // --- อัปเดต Dashboard ให้รองรับ View Mode ---
     function renderDashboardInsights() {
-        const m = document.getElementById('insightMonth').value; const evalData = evaluateMonth(m);
+        const m = document.getElementById('insightMonth').value; 
+        const viewMode = document.getElementById('insightViewMode').value;
+        const evalData = evaluateMonth(m, viewMode);
+        
         document.getElementById('insightScoreShow').innerText = evalData.totalScore.toFixed(1);
+        document.getElementById('insightScoreLabel').innerText = viewMode === 'YTD' ? 'คะแนนรวมสะสม (เต็ม 15)' : 'คะแนนเฉพาะเดือนนี้ (เต็ม 15)';
         
-        // นับจำนวนผ่านของแต่ละกลุ่ม
-        let fixedPass = 0, fixedTotal = 0;
-        let meanPass = 0, meanTotal = 0;
-        
+        let fixedPass = 0, fixedTotal = 0, meanPass = 0, meanTotal = 0;
         evalData.results.forEach(r => {
             if (r.evalType === 'FIXED') { fixedTotal++; if(r.isPass) fixedPass++; }
             if (r.evalType === 'MEAN') { meanTotal++; if(r.isPass) meanPass++; }
         });
-        
         document.getElementById('insightFixedCount').innerText = `${fixedPass}/${fixedTotal}`;
         document.getElementById('insightMeanCount').innerText = `${meanPass}/${meanTotal}`;
 
@@ -456,22 +513,28 @@
                 listDiv.innerHTML += `<div class="insight-item ${borderClass}"><div class="pe-2">${icon}</div><div class="flex-grow-1"><div class="fw-bold" style="color: #0e2b5c; font-size:0.9rem;">${r.id} ${r.name} ${typeBadge}</div><div class="text-muted" style="font-size:0.8rem;">${reason}</div></div></div>`;
             }
         });
-        if(!hasInsight) listDiv.innerHTML = '<div class="text-center text-success py-3"><i class="fa-solid fa-circle-check fs-2 mb-2"></i><br>ยอดเยี่ยม! ผ่านเกณฑ์ทุกตัวชี้วัดในเดือนนี้</div>';
+        if(!hasInsight) listDiv.innerHTML = '<div class="text-center text-success py-3"><i class="fa-solid fa-circle-check fs-2 mb-2"></i><br>ยอดเยี่ยม! ผ่านเกณฑ์ทุกตัวชี้วัดในงวดนี้</div>';
     }
 
     function renderDashboard() {
         document.getElementById('dashSyncStatus').innerText = 'อัปเดตแล้วเมื่อ ' + new Date().toLocaleTimeString();
-        const months = Object.keys(dbData).sort(); let scores = months.map(m => evaluateMonth(m).totalScore);
+        const viewMode = document.getElementById('insightViewMode').value;
+        const months = Object.keys(dbData).sort(); 
+        let scores = months.map(m => evaluateMonth(m, viewMode).totalScore);
+        
         var options = { series: [{ name: 'คะแนนรวม', data: scores }], chart: { type: 'area', height: 280, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { curve: 'smooth', width: 3 }, fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } }, xaxis: { categories: months }, yaxis: { min: 0, max: 15 }, colors: ['#0e2b5c'], dataLabels: { enabled: true, formatter: function(val) { return val.toFixed(1); }, style: { colors: ['#0e2b5c'] } } };
         if (chartInstances['totalScore']) chartInstances['totalScore'].destroy();
         chartInstances['totalScore'] = new ApexCharts(document.querySelector("#totalScoreChart"), options); chartInstances['totalScore'].render();
     }
 
     function openRunChart(indicatorId) {
-        const dummyEval = evaluateMonth(document.getElementById('insightMonth').value).results.find(r => r.id === indicatorId);
-        document.getElementById('chartModalTitle').innerHTML = `<i class="fa-solid fa-chart-line me-2"></i>${dummyEval ? dummyEval.name : 'Run Chart'}`;
+        const viewMode = document.getElementById('insightViewMode').value;
+        const dummyEval = evaluateMonth(document.getElementById('insightMonth').value, viewMode).results.find(r => r.id === indicatorId);
+        document.getElementById('chartModalTitle').innerHTML = `<i class="fa-solid fa-chart-line me-2"></i>${dummyEval ? dummyEval.name : 'Run Chart'} (${viewMode})`;
+        
         const months = Object.keys(dbData).sort(); 
-        let seriesData = months.map(m => { let res = evaluateMonth(m).results.find(r => r.id === indicatorId); return res && !res.isMissing ? parseFloat(res.value.toFixed(2)) : null; });
+        let seriesData = months.map(m => { let res = evaluateMonth(m, viewMode).results.find(r => r.id === indicatorId); return res && !res.isMissing ? parseFloat(res.value.toFixed(2)) : null; });
+        
         var options = { series: [{ name: 'ผลลัพธ์', data: seriesData }], chart: { type: 'line', height: 350, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { width: 4, curve: 'straight' }, xaxis: { categories: months }, markers: { size: 6, hover: { size: 8 } }, colors: ['#c5a059'], tooltip: { y: { formatter: function (val) { return val.toLocaleString() } } } };
         if (chartInstances['modalChart']) chartInstances['modalChart'].destroy();
         chartInstances['modalChart'] = new ApexCharts(document.querySelector("#apexRunChart"), options); chartInstances['modalChart'].render();
