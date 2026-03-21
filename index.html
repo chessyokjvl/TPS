@@ -232,9 +232,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // ========================================================
-    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่
+    // ⚠️ นำ URL ของ Web App (Google Apps Script) มาใส่ที่นี่ ⚠️
     // ========================================================
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY4RBJNIqC_OVTUPcoRFJrsVR8FonItmWwLQzRq6KE54NTmlgMwKPyYX0AaC1VbDgs/exec';
+    const APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
     
     let currentUserRole = ''; let currentDeptName = '';
     let dbData = {}; let globalConfig = {}; 
@@ -264,7 +264,7 @@
                 if (currentUserRole === 'GUEST') document.getElementById('navInputTab').style.display = 'none';
                 buildInputGrid(); fetchAllData(); 
             } else { document.getElementById('loginAlert').innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> ' + data.message; document.getElementById('loginAlert').classList.remove('d-none'); }
-        } catch(err) {}
+        } catch(err) { document.getElementById('loginAlert').innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> การเชื่อมต่อขัดข้อง'; document.getElementById('loginAlert').classList.remove('d-none'); }
         btn.disabled = false; btn.innerHTML = 'เข้าสู่ระบบ <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i>';
     });
 
@@ -280,6 +280,7 @@
         });
     }
     function updateColor(el) { if(el.value !== '') { el.classList.remove('input-empty'); el.classList.add('input-filled'); } else { el.classList.remove('input-filled'); el.classList.add('input-empty'); } }
+    
     function filterGrid() {
         const filter = document.getElementById('filterStatus').value; const rows = document.querySelectorAll('.var-row');
         rows.forEach(row => { const isFilled = row.querySelector('.var-input').value !== ''; if (filter === 'ALL') row.style.display = ''; else if (filter === 'EMPTY') row.style.display = isFilled ? 'none' : ''; else if (filter === 'FILLED') row.style.display = isFilled ? '' : 'none'; });
@@ -303,26 +304,38 @@
     }
 
     document.getElementById('batchSaveForm').addEventListener('submit', async (e) => {
-        e.preventDefault(); const btn = document.getElementById('btnBatchSave'); btn.disabled = true;
+        e.preventDefault(); const btn = document.getElementById('btnBatchSave'); const alertBox = document.getElementById('saveAlert');
+        btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>กำลังบันทึกข้อมูลลงฐานระบบ...';
         let payloadVars = {}; document.querySelectorAll('.var-input').forEach(el => { if (el.value !== '') payloadVars[el.dataset.code] = el.value; });
         try {
             const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'save_batch', report_month: document.getElementById('selectMonth').value, dept_name: currentDeptName, variables: payloadVars }) });
-            const data = await res.json(); if(data.status === 'success') fetchAllData(); 
-        } catch(err) {}
-        btn.disabled = false;
+            const data = await res.json();
+            alertBox.className = `alert mt-4 alert-${data.status === 'success' ? 'success' : 'danger'}`; alertBox.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i> ' + data.message;
+            if(data.status === 'success') fetchAllData(); 
+        } catch(err) { alertBox.className = 'alert mt-4 alert-danger'; alertBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> เกิดข้อผิดพลาดในการบันทึก'; }
+        alertBox.classList.remove('d-none'); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up me-2"></i>บันทึกข้อมูลเข้าสู่ระบบ';
+        setTimeout(() => alertBox.classList.add('d-none'), 3000);
     });
 
     // ==========================================
-    // CORE ENGINE (ใช้ Condition: รับ >= -5%, จ่าย <= +5%)
+    // CORE ENGINE (คำนวณเดือนสะสม และรับ >= -5%, จ่าย <= +5%)
     // ==========================================
     function evaluateMonth(monthStr) {
         const d = dbData[monthStr] || {}; 
         
-        // คำนวณวันของเดือน และดึง Config
         const mParts = monthStr.split('-');
-        const daysInMonth = new Date(parseInt(mParts[0]), parseInt(mParts[1]), 0).getDate();
+        const monthNum = parseInt(mParts[1]);
+        const daysInMonth = new Date(parseInt(mParts[0]), monthNum, 0).getDate();
+        
+        // หาเดือนที่เท่าไหร่ของปีงบประมาณ (ต.ค. = 1, พ.ย. = 2 ... ก.ย. = 12)
+        const fyMonthIndex = monthNum >= 10 ? monthNum - 9 : monthNum + 3;
+
+        // ดึง Config และทำเป็นแผนสะสม (YTD Plan)
         const planRevMo = parseFloat(globalConfig.PLAN_REV_YEAR || 0) / 12;
         const planExpMo = parseFloat(globalConfig.PLAN_EXP_YEAR || 0) / 12;
+        const planRevCum = planRevMo * fyMonthIndex;
+        const planExpCum = planExpMo * fyMonthIndex;
+        
         const bedCount = parseFloat(globalConfig.BED_COUNT || 120);
 
         const has = (...keys) => keys.every(k => d[k] !== undefined && d[k] !== '');
@@ -334,35 +347,35 @@
             results.push({ id, name, formula: form, value: val, unit, target, isPass, score: s, scoreMax, isMissing });
         };
 
-        // 1.1 (อัปเดตลอจิกตามที่ตกลงกันล่าสุด)
-        if (has('ACTUAL_REV') && planRevMo>0) { let val = ((v('ACTUAL_REV')-planRevMo)/planRevMo)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')}-${planRevMo.toFixed(0)})/${planRevMo.toFixed(0)})*100`, val, '%', 'ติดลบไม่เกิน 5%', val >= -5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', 'ติดลบไม่เกิน 5%', false, 0, 1, true);
-        if (has('ACTUAL_EXP') && planExpMo>0) { let val = ((v('ACTUAL_EXP')-planExpMo)/planExpMo)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')}-${planExpMo.toFixed(0)})/${planExpMo.toFixed(0)})*100`, val, '%', 'บวกไม่เกิน 5%', val <= 5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', 'บวกไม่เกิน 5%', false, 0, 1, true);
+        // 1.1 วินัยทางการเงิน (รับ ติดลบไม่เกิน 5%, จ่าย บวกไม่เกิน 5%)
+        if (has('ACTUAL_REV') && planRevCum > 0) { let val = ((v('ACTUAL_REV')-planRevCum)/planRevCum)*100; pushResult('1.1.1', 'วินัยการเงิน (รับ)', `((${v('ACTUAL_REV')} - ${planRevCum.toFixed(0)}) / ${planRevCum.toFixed(0)}) * 100`, val, '%', 'ติดลบไม่เกิน 5%', val >= -5, 1, 1); } else pushResult('1.1.1', 'วินัยการเงิน (รับ)', '-', NaN, '%', 'ติดลบไม่เกิน 5%', false, 0, 1, true);
+        if (has('ACTUAL_EXP') && planExpCum > 0) { let val = ((v('ACTUAL_EXP')-planExpCum)/planExpCum)*100; pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', `((${v('ACTUAL_EXP')} - ${planExpCum.toFixed(0)}) / ${planExpCum.toFixed(0)}) * 100`, val, '%', 'บวกไม่เกิน 5%', val <= 5, 1, 1); } else pushResult('1.1.2', 'วินัยการเงิน (จ่าย)', '-', NaN, '%', 'บวกไม่เกิน 5%', false, 0, 1, true);
         
         // 1.2
-        if (has('AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(daysInMonth*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${daysInMonth}*${avg})/${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, true);
-        if (has('AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(daysInMonth*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${daysInMonth}*${avg})/${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
-        if (has('AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(daysInMonth*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${daysInMonth}*${avg})/${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
-        if (has('INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(daysInMonth*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${daysInMonth}*${avg})/${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.4', 'สินค้าคงคลัง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('AP_BEGIN', 'AP_END', 'AP_PURCHASE') && v('AP_PURCHASE')!==0) { let avg=(v('AP_BEGIN')+v('AP_END'))/2; let val=(daysInMonth*avg)/v('AP_PURCHASE'); pushResult('1.2.1', 'ชำระหนี้', `(${daysInMonth} * ${avg}) / ${v('AP_PURCHASE')}`, val, 'วัน', '<= 90', val<=90, 1, 1); } else pushResult('1.2.1', 'ชำระหนี้', '-', NaN, 'วัน', '<= 90', false, 0, 1, true);
+        if (has('AR_UC_BEGIN', 'AR_UC_END', 'REV_UC') && v('REV_UC')!==0) { let avg=(v('AR_UC_BEGIN')+v('AR_UC_END'))/2; let val=(daysInMonth*avg)/v('REV_UC'); pushResult('1.2.2', 'เรียกเก็บหนี้ UC', `(${daysInMonth} * ${avg}) / ${v('REV_UC')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.2', 'เรียกเก็บหนี้ UC', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('AR_CGD_BEGIN', 'AR_CGD_END', 'REV_CGD') && v('REV_CGD')!==0) { let avg=(v('AR_CGD_BEGIN')+v('AR_CGD_END'))/2; let val=(daysInMonth*avg)/v('REV_CGD'); pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', `(${daysInMonth} * ${avg}) / ${v('REV_CGD')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.3', 'เรียกเก็บ กรมบัญชีกลาง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
+        if (has('INV_BEGIN', 'INV_END', 'INV_DISPENSE') && v('INV_DISPENSE')!==0) { let avg=(v('INV_BEGIN')+v('INV_END'))/2; let val=(daysInMonth*avg)/v('INV_DISPENSE'); pushResult('1.2.4', 'สินค้าคงคลัง', `(${daysInMonth} * ${avg}) / ${v('INV_DISPENSE')}`, val, 'วัน', '<= 60', val<=60, 0.5, 0.5); } else pushResult('1.2.4', 'สินค้าคงคลัง', '-', NaN, 'วัน', '<= 60', false, 0, 0.5, true);
 
         // 2
         let tc = v('EXP_LC')+v('EXP_MC_MED')+v('EXP_MC_OTHER')+v('EXP_DEP_AMORT'); let tr = v('REV_OP')+v('REV_IP') || 1;
-        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')}/${tr})*${tc})/${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1); } else pushResult('2.1.1', 'Unit Cost OPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
-        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')}/${tr})*${tc})/${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1); } else pushResult('2.1.2', 'Unit Cost IPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        if (has('REV_OP', 'OP_VISIT') && v('OP_VISIT')!==0) { let val=((v('REV_OP')/tr)*tc)/v('OP_VISIT'); pushResult('2.1.1', 'Unit Cost OPD', `((${v('REV_OP')} / ${tr}) * ${tc}) / ${v('OP_VISIT')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_OPD||0), 1, 1); } else pushResult('2.1.1', 'Unit Cost OPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
+        if (has('REV_IP', 'SUM_ADJRW') && v('SUM_ADJRW')!==0) { let val=((v('REV_IP')/tr)*tc)/v('SUM_ADJRW'); pushResult('2.1.2', 'Unit Cost IPD', `((${v('REV_IP')} / ${tr}) * ${tc}) / ${v('SUM_ADJRW')}`, val, 'บาท', '<= Mean', val<=(globalConfig.MEAN_UC_IPD||0), 1, 1); } else pushResult('2.1.2', 'Unit Cost IPD', '-', NaN, 'บาท', '<= Mean', false, 0, 1, true);
         
         if (has('EXP_LC')) pushResult('2.2.1', 'ค่าแรง (LC)', '-', v('EXP_LC'), 'บาท', '<= Mean', v('EXP_LC')<=(globalConfig.MEAN_LC||0), 0.5, 0.5); else pushResult('2.2.1', 'ค่าแรง (LC)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
         if (has('EXP_MC_MED')) pushResult('2.2.2', 'ค่ายา (MC Med)', '-', v('EXP_MC_MED'), 'บาท', '<= Mean', v('EXP_MC_MED')<=(globalConfig.MEAN_MC_MED||0), 0.5, 0.5); else pushResult('2.2.2', 'ค่ายา (MC Med)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
         if (has('EXP_MC_OTHER')) pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', v('EXP_MC_OTHER'), 'บาท', '<= Mean', v('EXP_MC_OTHER')<=(globalConfig.MEAN_MC_OTHER||0), 0.5, 0.5); else pushResult('2.2.3', 'ค่าวัสดุอื่นๆ (MC)', '-', NaN, 'บาท', '<= Mean', false, 0, 0.5, true);
 
-        if (has('BED_DAYS')) { let val=(v('BED_DAYS')*100)/(bedCount*daysInMonth); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')}*100)/(${bedCount}*${daysInMonth})`, val, '%', '> 80%', val>80, 1, 1); } else pushResult('2.3.1', 'อัตราครองเตียง', '-', NaN, '%', '> 80%', false, 0, 1, true);
+        if (has('BED_DAYS')) { let val=(v('BED_DAYS')*100)/(bedCount*daysInMonth); pushResult('2.3.1', 'อัตราครองเตียง', `(${v('BED_DAYS')} * 100) / (${bedCount} * ${daysInMonth})`, val, '%', '> 80%', val>80, 1, 1); } else pushResult('2.3.1', 'อัตราครองเตียง', '-', NaN, '%', '> 80%', false, 0, 1, true);
         if (has('SUM_ADJRW')) pushResult('2.3.2', 'Sum AdjRW', '-', v('SUM_ADJRW'), 'หน่วย', '> Mean', v('SUM_ADJRW')>(globalConfig.MEAN_ADJRW||0), 1, 1); else pushResult('2.3.2', 'Sum AdjRW', '-', NaN, 'หน่วย', '> Mean', false, 0, 1, true);
 
         // 3
         let opRev = v('ACTUAL_REV')-v('REV_DEP_NHSO'); let opExp = v('ACTUAL_EXP')-v('EXP_DEP_AMORT');
-        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev-opExp; pushResult('3.1.1', 'กำไรดำเนินงาน', '-', val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.1.1', 'กำไรดำเนินงาน', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let div=v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val=((opRev-opExp)/div)*100; pushResult('3.1.2', 'Operating Margin', '-', val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1, 1); } else pushResult('3.1.2', 'Operating Margin', '-', NaN, '%', '> Mean', false, 0, 1, true);
-        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let val=((v('ACTUAL_REV')-v('ACTUAL_EXP'))/(v('ASSET_CUR')+v('ASSET_NON_CUR')))*100; pushResult('3.1.3', 'ROA', '-', val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1, 1); } else pushResult('3.1.3', 'ROA', '-', NaN, '%', '> Mean', false, 0, 1, true);
-        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let val=(v('ASSET_CUR')-v('DONATION_FUND'))-(v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC'))); pushResult('3.2.1', 'ทุนสำรองสุทธิ', '-', val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.2.1', 'ทุนสำรองสุทธิ', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
-        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let val=(v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'))/v('LIAB_CUR'); pushResult('3.2.2', 'Cash Ratio', '-', val, 'เท่า', '>= 0.8', val>=0.8, 1, 1); } else pushResult('3.2.2', 'Cash Ratio', '-', NaN, 'เท่า', '>= 0.8', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP')) { let val = opRev-opExp; pushResult('3.1.1', 'กำไรดำเนินงาน', `(${v('ACTUAL_REV')} - ${v('REV_DEP_NHSO')}) - (${v('ACTUAL_EXP')} - ${v('EXP_DEP_AMORT')})`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.1.1', 'กำไรดำเนินงาน', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'REV_BUMRUNG', 'REV_GOV_BUDGET_HR')) { let div=v('REV_BUMRUNG')+v('REV_GOV_BUDGET_HR'); let val=((opRev-opExp)/div)*100; pushResult('3.1.2', 'Operating Margin', `(${(opRev-opExp)} / ${div}) * 100`, val, '%', '> Mean', val>(globalConfig.MEAN_OP_MARGIN||0), 1, 1); } else pushResult('3.1.2', 'Operating Margin', '-', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ACTUAL_REV', 'ACTUAL_EXP', 'ASSET_CUR', 'ASSET_NON_CUR')) { let val=((v('ACTUAL_REV')-v('ACTUAL_EXP'))/(v('ASSET_CUR')+v('ASSET_NON_CUR')))*100; pushResult('3.1.3', 'ROA', `(${v('ACTUAL_REV') - v('ACTUAL_EXP')} / ${v('ASSET_CUR') + v('ASSET_NON_CUR')}) * 100`, val, '%', '> Mean', val>(globalConfig.MEAN_ROA||0), 1, 1); } else pushResult('3.1.3', 'ROA', '-', NaN, '%', '> Mean', false, 0, 1, true);
+        if (has('ASSET_CUR', 'LIAB_CUR', 'DONATION_FUND', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC')) { let val=(v('ASSET_CUR')-v('DONATION_FUND'))-(v('LIAB_CUR')-(v('AP_INVEST')+v('AP_DONATION')+v('DEPOSIT_UC'))); pushResult('3.2.1', 'ทุนสำรองสุทธิ', `(${v('ASSET_CUR')} - ${v('DONATION_FUND')}) - (${v('LIAB_CUR')} - ...)`, val, 'บาท', 'เป็นบวก', val>0, 1, 1); } else pushResult('3.2.1', 'ทุนสำรองสุทธิ', '-', NaN, 'บาท', 'เป็นบวก', false, 0, 1, true);
+        if (has('LIAB_CUR', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT')) { let val=(v('CASH')+v('CASH_EQ')+v('FIXED_DEPOSIT'))/v('LIAB_CUR'); pushResult('3.2.2', 'Cash Ratio', `(${v('CASH')} + ${v('CASH_EQ')} + ${v('FIXED_DEPOSIT')}) / ${v('LIAB_CUR')}`, val, 'เท่า', '>= 0.8', val>=0.8, 1, 1); } else pushResult('3.2.2', 'Cash Ratio', '-', NaN, 'เท่า', '>= 0.8', false, 0, 1, true);
 
         return { totalScore, results };
     }
@@ -373,7 +386,7 @@
         evalData.results.forEach(r => {
             let resText = r.isMissing ? '<span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> รอข้อมูล</span>' : r.value.toLocaleString(undefined, {maximumFractionDigits:2});
             let badge = r.isMissing ? `<span class="badge bg-secondary fs-6">-</span>` : (r.isPass ? `<span class="badge bg-success fs-6"><i class="fa-solid fa-check"></i> ${r.score}</span>` : `<span class="badge bg-danger fs-6"><i class="fa-solid fa-xmark"></i> 0</span>`);
-            tbody.innerHTML += `<tr><td class="fw-bold text-start px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name}</td><td class="px-2 px-md-3"><div class="formula-box">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
+            tbody.innerHTML += `<tr><td class="fw-bold text-start px-2 px-md-3" style="color: #0e2b5c;">${r.id} ${r.name}</td><td class="px-2 px-md-3"><div class="formula-box text-start">${r.formula}</div></td><td class="fw-bold text-primary fs-5 px-2 text-nowrap">${resText} <span class="fs-6 fw-normal">${r.unit}</span></td><td class="text-muted small px-2 text-nowrap">${r.target}</td><td class="px-2">${badge}</td></tr>`;
         });
     }
 
@@ -403,7 +416,7 @@
         document.getElementById('chartModalTitle').innerHTML = `<i class="fa-solid fa-chart-line me-2"></i>${dummyEval ? dummyEval.name : 'Run Chart'}`;
         const months = Object.keys(dbData).sort(); 
         let seriesData = months.map(m => { let res = evaluateMonth(m).results.find(r => r.id === indicatorId); return res && !res.isMissing ? parseFloat(res.value.toFixed(2)) : null; });
-        var options = { series: [{ name: 'ผลลัพธ์', data: seriesData }], chart: { type: 'line', height: 350, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { width: 4, curve: 'straight' }, xaxis: { categories: months }, markers: { size: 6, hover: { size: 8 } }, colors: ['#c5a059'] };
+        var options = { series: [{ name: 'ผลลัพธ์', data: seriesData }], chart: { type: 'line', height: 350, toolbar: { show: false }, fontFamily: 'Sarabun' }, stroke: { width: 4, curve: 'straight' }, xaxis: { categories: months }, markers: { size: 6, hover: { size: 8 } }, colors: ['#c5a059'], tooltip: { y: { formatter: function (val) { return val.toLocaleString() } } } };
         if (chartInstances['modalChart']) chartInstances['modalChart'].destroy();
         chartInstances['modalChart'] = new ApexCharts(document.querySelector("#apexRunChart"), options); chartInstances['modalChart'].render();
         var myModal = new bootstrap.Modal(document.getElementById('chartModal')); myModal.show();
