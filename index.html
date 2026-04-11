@@ -260,7 +260,6 @@
     let dbData = {}; let globalConfig = {}; 
     let chartInstances = {};
 
-    // เพิ่ม กลุ่มที่ 7 ให้ Admin กรอกรายเดือน
     const varGroups = [
         { id: 1, title: 'กลุ่มที่ 1: งานประกันสุขภาพ (UC/กรมบัญชีกลาง)', roles: ['ADMIN', 'INSURANCE'], vars: [ { code: 'AR_UC_BEGIN', desc: 'สิทธิ UC : ยอดเรียกเก็บต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'AR_UC_END', desc: 'สิทธิ UC : ยอดเรียกเก็บปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'REV_UC', desc: 'สิทธิ UC : รายรับค่ารักษางวดนี้ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'AR_CGD_BEGIN', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'AR_CGD_END', desc: 'สิทธิกรมบัญชีกลาง : ยอดเรียกเก็บปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'REV_CGD', desc: 'สิทธิกรมบัญชีกลาง : รายรับงวดนี้ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_OP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา OPD (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' }, { code: 'REV_IP', desc: 'รวมทุกสิทธิ : รายได้ค่ารักษา IPD (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' } ] },
         { id: 2, title: 'กลุ่มที่ 2: เภสัชกรรม (คลังยา/เวชภัณฑ์)', roles: ['ADMIN', 'PHARMACY'], vars: [ { code: 'INV_BEGIN', desc: 'ยอดคงคลังต้นงวด (ยอดคงเหลือ ณ ต้นเดือน)' }, { code: 'INV_END', desc: 'ยอดคงคลังปลายงวด (ยอดคงเหลือ ณ สิ้นเดือน)' }, { code: 'INV_DISPENSE', desc: 'มูลค่าการจ่ายยา/เวชภัณฑ์ (ยอดที่เกิดขึ้นเฉพาะเดือนนี้)' } ] },
@@ -360,28 +359,32 @@
     }
 
     function aggregateData(selectedMonth, mode) {
-        if (mode === 'MONTHLY') return dbData[selectedMonth] || {};
+        let mParts = selectedMonth.split('-');
+        let daysInThisMonth = new Date(parseInt(mParts[0]), parseInt(mParts[1]), 0).getDate();
+
+        if (mode === 'MONTHLY') {
+            let dRet = Object.assign({}, dbData[selectedMonth] || {});
+            dRet['DAYS_IN_MONTH'] = daysInThisMonth;
+            return dRet;
+        }
 
         let fyMonths = getFYMonthsUpTo(selectedMonth);
         let dYTD = {};
         
-        // แยกประเภทตัวแปร
-        let flowVars = ['ACTUAL_REV', 'ACTUAL_EXP', 'REV_UC', 'REV_CGD', 'REV_OP', 'REV_IP', 'EXP_LC', 'EXP_MC_MED', 'EXP_MC_OTHER', 'OP_VISIT', 'SUM_ADJRW', 'BED_DAYS', 'AP_PURCHASE', 'INV_DISPENSE', 'REV_DEP_NHSO', 'EXP_DEP_AMORT', 'REV_GOV_BUDGET_HR', 'REV_BUMRUNG', 'MEAN_LC', 'MEAN_MC_MED', 'MEAN_MC_OTHER', 'MEAN_ADJRW'];
+        let flowVars = ['ACTUAL_REV', 'ACTUAL_EXP', 'REV_UC', 'REV_CGD', 'REV_OP', 'REV_IP', 'EXP_LC', 'EXP_MC_MED', 'EXP_MC_OTHER', 'OP_VISIT', 'SUM_ADJRW', 'BED_DAYS', 'AP_PURCHASE', 'INV_DISPENSE', 'REV_DEP_NHSO', 'EXP_DEP_AMORT', 'REV_GOV_BUDGET_HR', 'REV_BUMRUNG'];
         let stockEndVars = ['AP_END', 'AR_UC_END', 'AR_CGD_END', 'INV_END', 'ASSET_CUR', 'ASSET_NON_CUR', 'DONATION_FUND', 'LIAB_CUR', 'AP_INVEST', 'AP_DONATION', 'DEPOSIT_UC', 'CASH', 'CASH_EQ', 'FIXED_DEPOSIT'];
         let stockBeginVars = ['AP_BEGIN', 'AR_UC_BEGIN', 'AR_CGD_BEGIN', 'INV_BEGIN'];
-        let ratioMeanVars = ['MEAN_UC_OPD', 'MEAN_UC_IPD', 'MEAN_OP_MARGIN', 'MEAN_ROA']; // พวกนี้ต้องถูกหาค่าเฉลี่ย
+        let ratioMeanVars = ['MEAN_UC_OPD', 'MEAN_UC_IPD', 'MEAN_LC', 'MEAN_MC_MED', 'MEAN_MC_OTHER', 'MEAN_ADJRW', 'MEAN_OP_MARGIN', 'MEAN_ROA'];
 
         let dRaw = dbData[selectedMonth] || {};
         let dFirst = dbData[getOctoberStr(selectedMonth)] || {};
 
-        // รวม Flow (บวกสะสม)
         flowVars.forEach(v => {
             let hasValue = false; let sum = 0;
             fyMonths.forEach(m => { if (dbData[m] && dbData[m][v] !== undefined && dbData[m][v] !== '') { hasValue = true; sum += parseFloat(dbData[m][v]); } });
             if (hasValue) dYTD[v] = sum;
         });
 
-        // รวม Ratio Mean (หาค่าเฉลี่ยของเดือนที่มีการกรอก)
         ratioMeanVars.forEach(v => {
             let hasValue = false; let sum = 0; let count = 0;
             fyMonths.forEach(m => {
@@ -409,6 +412,7 @@
         const planExpTarget = mode === 'YTD' ? planExpMo * fyMonthIndex : planExpMo;
         
         const bedCount = parseFloat(globalConfig.BED_COUNT || 120);
+
         const has = (...keys) => keys.every(k => d[k] !== undefined && d[k] !== '');
         const v = (code) => parseFloat(d[code] || 0);
 
